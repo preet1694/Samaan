@@ -1,11 +1,13 @@
-package org.samaan;
+package com.example.samaan.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.example.samaan.services.GeocodingService;
+import com.example.samaan.models.LatLng;
+import com.example.samaan.utils.DistanceCalculator;
 @RestController
 @RequestMapping("/distance")
 public class DistanceController {
@@ -33,4 +35,3 @@ public class DistanceController {
 
     }
 }
-

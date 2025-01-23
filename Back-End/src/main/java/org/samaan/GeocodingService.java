@@ -1,8 +1,8 @@
-package org.samaan;
+package com.example.samaan.services;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import com.example.samaan.models.LatLng;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +33,7 @@ public class GeocodingService {
 
     public LatLng getCoordinates(String address) {
 
-        String apiKey = "API_KEY";                 // Replace with your actual OpenCage API key
+        String apiKey = "45cd452c08ed438e99edcfba859306aa";                 // Replace with your actual OpenCage API key
         String url = "https://api.opencagedata.com/geocode/v1/json?q=" + address + "&key=" + apiKey;
 
         ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);

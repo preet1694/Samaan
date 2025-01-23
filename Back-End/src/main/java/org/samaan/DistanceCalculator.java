@@ -1,5 +1,4 @@
-package org.samaan;
-
+package com.example.samaan.utils;
 public class DistanceCalculator {
     private static final double EARTH_RADIUS = 6371; // Radius in kilometers
 

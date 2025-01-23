@@ -1,4 +1,4 @@
-package org.samaan;
+package com.example.samaan.models;
 public class LatLng {
     private double lat;
     private double lng;
