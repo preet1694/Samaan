@@ -1,16 +1,24 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../styles.css';
 
 const Footer = () => {
-    return (
-        <footer id="contact" className="footer">
-            <div className="container">
-                <p>&copy; 2024 Samaan. All Rights Reserved.</p>
-                <p>Contact us at <a href="mailto:support@samaan.com">support@samaan.com</a></p>
-            </div>
-        </footer>
-    );
+  return (
+    <footer className="bg-gray-800 text-white text-center py-4">
+      <div className="container mx-auto">
+        <p className="text-gray-300">
+          &copy; 2024 Samaan. All Rights Reserved.
+        </p>
+        <p>
+          Contact us at{' '}
+          <a
+            href="mailto:support@samaan.com"
+            className="text-orange-500 hover:underline"
+          >
+            support@samaan.com
+          </a>
+        </p>
+      </div>
+    </footer>
+  );
 };
 
 export default Footer;
