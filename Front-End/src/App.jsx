@@ -11,72 +11,79 @@ import { SenderDetails } from './pages/SenderDetails';
 import { Wallet } from './pages/Wallet';
 import { Profile } from './pages/Profile';
 import { Hero } from './components/Hero';
-import  Footer  from './components/Footer';
-import HowItWorks from './components/HowItWorks'; // Import HowItWorks component
+import Footer from './components/Footer';
+import HowItWorks from './components/HowItWorks';
+import { AddTrip } from './pages/AddTrip'; // Import the AddTrip page
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gradient-to-r from-purple-300 via-teal-200 to-green-200 flex-grow p-10">
-        <Routes>
-          <Route path="/" element={
-            <>
-              <Navbar />
-              <Hero />
-              <div className="mt-16"> {/* Add margin-top here to create the gap */}
-                <HowItWorks /> {/* Add HowItWorks component here */}
-              </div>
-            </>
-          } />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/sender/dashboard" element={
-            <>
-              <Navbar />
-              <SenderDashboard />
-            </>
-          } />
-          <Route path="/carrier/dashboard" element={
-            <>
-              <Navbar />
-              <CarrierDashboard />
-            </>
-          } />
-          <Route path="/search-carrier" element={
-            <>
-              <Navbar />
-              <SearchCarrier />
-            </>
-          } />
-          <Route path="/carrier/:id" element={
-            <>
-              <Navbar />
-              <CarrierDetails />
-            </>
-          } />
-          <Route path="/sender/:id" element={
-            <>
-              <Navbar />
-              <SenderDetails />
-            </>
-          } />
-          <Route path="/wallet" element={
-            <>
-              <Navbar />
-              <Wallet />
-            </>
-          } />
-          <Route path="/profile" element={
-            <>
-              <Navbar />
-              <Profile />
-            </>
-          } />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
-      <Footer />
-    </Router>
+      <Router>
+        <div className="min-h-screen bg-gradient-to-r from-purple-300 via-teal-200 to-green-200 flex-grow p-10">
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Navbar />
+                <Hero />
+                <div className="mt-16">
+                  <HowItWorks />
+                </div>
+              </>
+            } />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/sender/dashboard" element={
+              <>
+                <Navbar />
+                <SenderDashboard />
+              </>
+            } />
+            <Route path="/carrier/dashboard" element={
+              <>
+                <Navbar />
+                <CarrierDashboard />
+              </>
+            } />
+            <Route path="/add-trip" element={
+              <>
+                <Navbar />
+                <AddTrip />  {/* AddTrip page included */}
+              </>
+            } />
+            <Route path="/search-carrier" element={
+              <>
+                <Navbar />
+                <SearchCarrier />
+              </>
+            } />
+            <Route path="/carrier/:id" element={
+              <>
+                <Navbar />
+                <CarrierDetails />
+              </>
+            } />
+            <Route path="/sender/:id" element={
+              <>
+                <Navbar />
+                <SenderDetails />
+              </>
+            } />
+            <Route path="/wallet" element={
+              <>
+                <Navbar />
+                <Wallet />
+              </>
+            } />
+            <Route path="/profile" element={
+              <>
+                <Navbar />
+                <Profile />
+              </>
+            } />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+        <Footer />
+      </Router>
   );
 }
 
