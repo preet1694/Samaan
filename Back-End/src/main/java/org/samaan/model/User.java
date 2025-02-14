@@ -1,25 +1,21 @@
 package org.samaan.model;
 
+import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import lombok.Data;
-
 @Data
-@Document(collection = "users")
+@Document(collection = "users") // Make sure this matches your MongoDB collection
 public class User {
     @Id
     private String id;
-    private String username;
+    private String name;
     private String email;
     private String password;
     private String role;
-    private String phoneNumber;
-    private boolean isVerified;
-    private String profileImage;
-    private String createdAt;
-    private String updatedAt;
 
-    public String getName() {
-        return username;
+    public void setCreatedAt(String string) {
+    }
+
+    public void setUpdatedAt(String string) {
     }
 }
