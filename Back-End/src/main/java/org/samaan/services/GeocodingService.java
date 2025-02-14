@@ -6,14 +6,16 @@ import org.samaan.model.LatLng;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 
 @SuppressWarnings("ALL")
 @Service
 public class GeocodingService {
+    @Value("${opencage.key}")
+    String apiKey ;
     private final RestTemplate restTemplate = new RestTemplate();
     public List<String> getSuggestions(String query) {
 
-        String apiKey = "45cd452c08ed438e99edcfba859306aa"; // Replace with your OpenCage API key
         String url = "https://api.opencagedata.com/geocode/v1/json?q=" + query + "&key=" + apiKey + "&countrycode=in"+"&limit=5";
 
 
