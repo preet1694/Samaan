@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Package } from 'lucide-react';
 import { GoogleAuth } from './GoogleAuth';
-import axios from 'axios';
 
 export const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -21,30 +20,45 @@ export const Login = () => {
     try {
       console.log("Sending login request:", formData);
 
-      const response = await axios.post("http://localhost:8080/api/users/login", {
-        email: formData.email.trim(),
-        password: formData.password.trim(),
-      }, {
+      const response = await fetch("http://localhost:8080/api/users/login", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
-      console.log("Login successful:", response.data);
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData);
+        setError(errorData.error || "An unknown error occurred");
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Login successful:", data);
+
+      // Store user role and ID in localStorage
+      localStorage.setItem("userId", data._id);
+      localStorage.setItem("userRole", data.role);
 
       // Navigate based on user role
-      if (response.data.role === "sender") {
-        localStorage.setItem("userId", response.data._id);
+      if (data.role === "sender") {
         navigate("/sender/dashboard");
-      } else if (response.data.role === "carrier") {
+      } else if (data.role === "carrier") {
         navigate("/carrier/dashboard");
       } else {
         setError("Invalid role. Please contact support.");
       }
     } catch (error) {
       console.error("Error during login:", error);
-      setError(error.response?.data?.error || "Internal Server Error. Please try again later.");
+      setError("Internal Server Error. Please try again later.");
     }
   };
 
@@ -54,7 +68,7 @@ export const Login = () => {
           <div className="flex justify-center">
             <div className="flex items-center">
               <Package className="h-12 w-12 text-indigo-600" />
-              <span className="ml-2 text-3xl font-bold text-gray-900">TravelShip</span>
+              <span className="ml-2 text-3xl font-bold text-gray-900">Samaan</span>
             </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
@@ -112,7 +126,9 @@ export const Login = () => {
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">Remember me</label>
                 </div>
                 <div className="text-sm">
-                  <Link to="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">Forgot your password?</Link>
+                  <Link to="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    Forgot your password?
+                  </Link>
                 </div>
               </div>
 

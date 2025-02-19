@@ -1,25 +1,15 @@
 package org.samaan.config;
 
+import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+import org.springframework.context.annotation.Configuration;
 
-public class MongoConfig extends AbstractMongoClientConfiguration {
-
-    @Override
-    protected String getDatabaseName() {
-        return "Samaan_Data"; // Replace with your database name
-    }
-
+@Configuration
+public class MongoConfig {
     @Bean
-    @Override
     public MongoClient mongoClient() {
-        return MongoClients.create("mongodb+srv://vrajranipa7:Vraj%401242@cluster0.lreyi.mongodb.net/"); // Replace with your connection URI
-    }
-
-    @Override
-    protected boolean autoIndexCreation() {
-        return true;
+        return MongoClients.create(new ConnectionString("mongodb+srv://vrajranipa7:vraj1204@cluster0.lreyi.mongodb.net/samaan"));
     }
 }

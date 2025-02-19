@@ -53,7 +53,7 @@ export const Register = () => {
           <div className="flex justify-center">
             <div className="flex items-center">
               <Package className="h-12 w-12 text-indigo-600" />
-              <span className="ml-2 text-3xl font-bold text-gray-900">TravelShip</span>
+              <span className="ml-2 text-3xl font-bold text-gray-900">Samaan</span>
             </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Create your account</h2>

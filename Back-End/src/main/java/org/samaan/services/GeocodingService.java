@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 @SuppressWarnings("ALL")
 @Service
 public class GeocodingService {
-    @Value("${opencage.key}")
-    String apiKey ;
+
+    String apiKey="45cd452c08ed438e99edcfba859306aa" ;
     private final RestTemplate restTemplate = new RestTemplate();
     public List<String> getSuggestions(String query) {
 

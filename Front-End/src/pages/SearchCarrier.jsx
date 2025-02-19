@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Truck, MessageCircle } from 'lucide-react';
 
 export const SearchCarrier = () => {
   const [searchParams, setSearchParams] = useState({ source: '', destination: '', date: '' });
   const [carriers, setCarriers] = useState([]);
-  const [prices, setPrices] = useState({}); // Store prices from backend
+  const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
+
+  // Get the logged-in user's role from localStorage
+  const userRole = localStorage.getItem("userRole");
 
   const handleSearch = async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const response = await axios.get(`http://localhost:8080/api/trips/search`, {
-        params: {
-          source: searchParams.source,
-          destination: searchParams.destination,
-          date: searchParams.date,
-        },
+      const response = await axios.get("http://localhost:8080/api/trips/search", {
+        params: { source: searchParams.source, destination: searchParams.destination, date: searchParams.date },
       });
       setCarriers(response.data);
 
@@ -27,14 +30,13 @@ export const SearchCarrier = () => {
       await Promise.all(
           response.data.map(async (carrier) => {
             try {
-              const priceResponse = await axios.get(`http://localhost:8080/api/price/calculate`, {
-                params: { source: searchParams.source,
-                  destination: searchParams.destination,},
+              const priceResponse = await axios.get("http://localhost:8080/api/price/calculate", {
+                params: { source: searchParams.source, destination: searchParams.destination },
               });
               priceData[carrier.id] = priceResponse.data.price;
             } catch (priceError) {
               console.error("Price calculation failed for carrier:", carrier.id);
-              priceData[carrier.id] = "N/A"; // Handle failure case
+              priceData[carrier.id] = "N/A";
             }
           })
       );
@@ -43,7 +45,14 @@ export const SearchCarrier = () => {
     } catch (err) {
       setError("Failed to fetch data. Please try again.");
     }
+
     setLoading(false);
+  };
+
+  const handleChat = (carrierId) => {
+    if (userRole === "sender") {
+      navigate(`/chat/${carrierId}`); // Navigate to chat page with the carrier
+    }
   };
 
   return (
@@ -136,14 +145,22 @@ export const SearchCarrier = () => {
                       </p>
                     </div>
                     <div className="mt-4 md:mt-0 flex flex-col items-end">
-                      {/* Price Calculation with Rupee Symbol */}
+                      {/* Price Calculation */}
                       <p className="text-2xl font-bold text-indigo-600">
                         ₹{prices[carrier.id] !== undefined ? prices[carrier.id] : "Calculating..."}
                       </p>
-                      <button className="mt-4 px-4 py-2 border text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 flex items-center">
-                        <MessageCircle className="h-5 w-5 mr-2" />
-                        Chat
-                      </button>
+                      {/* Show chat button only for senders */}
+                      {userRole === "sender" ? (
+                          <button
+                              onClick={() => handleChat(carrier.id)}
+                              className="mt-4 px-4 py-2 border text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 flex items-center"
+                          >
+                            <MessageCircle className="h-5 w-5 mr-2" />
+                            Chat
+                          </button>
+                      ) : (
+                          <span className="text-gray-500 mt-2">Only senders can chat</span>
+                      )}
                     </div>
                   </div>
                 </div>
