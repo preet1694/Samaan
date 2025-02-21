@@ -51,7 +51,7 @@ export const SearchCarrier = () => {
 
   const handleChat = (carrierId) => {
     if (userRole === "sender") {
-      navigate(`/chat/${carrierId}`); // Navigate to chat page with the carrier
+      navigate(`/join-chat`); // Navigate to chat page with the carrier
     }
   };
 

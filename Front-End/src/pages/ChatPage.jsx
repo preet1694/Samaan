@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MdAttachFile, MdSend } from "react-icons/md";
-import useChatContext from "../context/ChatContext";
-import { useNavigate } from "react-router";
+import useChatContext from "../context/ChatContext.jsx";
+import { useNavigate } from "react-router-dom";
 import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
 import toast from "react-hot-toast";
-import { baseURL } from "./config/AxiosHelper.js";
-import { getMessagess } from "./services/RoomService.js";
-import { timeAgo } from "./config/helper.js";
+import { baseURL } from "../config/AxiosHelper.js";
+import { getMessagess } from "../services/RoomService.js";
+import { timeAgo } from "../config/helper.js";
 const ChatPage = () => {
   const {
     roomId,
