@@ -1,33 +1,32 @@
 package org.samaan.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.ArrayList;
+import org.springframework.data.annotation.Id;
 import java.util.List;
 
+@Setter
 @Getter
 @Document(collection = "rooms")
-@NoArgsConstructor
-@AllArgsConstructor
 public class Room {
+    // Getters and Setters
     @Id
-    private String id;
     private String roomId;
-    private List<Message> messages = new ArrayList<>();
+    private List<Message> messages;
+    private String senderEmail;
+    private String carrierEmail;
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
-
-    public void setRoomId(String roomId) {
+    // Constructor
+    public Room(String roomId, List<Message> messages, String senderEmail, String carrierEmail) {
         this.roomId = roomId;
+        this.messages = messages;
+        this.senderEmail = senderEmail;
+        this.carrierEmail = carrierEmail;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public Room() {
+
     }
+
 }

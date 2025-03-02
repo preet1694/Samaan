@@ -1,31 +1,29 @@
 package org.samaan.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Document(collection = "messages") // Specifies this is a MongoDB document
+@Document(collection = "messages")
 public class Message {
-
     @Id
-    private String id; // Unique identifier for MongoDB
-
-    private String senderId;  // ID of sender
-    private String receiverId; // ID of receiver
-    private String content;
+    private String id;
+    private String roomId;
+    private String senderEmail;
+    private String carrierEmail;
+    private String message;
+    private boolean read;
     private LocalDateTime timestamp;
 
-    // Constructor for sending messages
-    public Message(String senderId, String receiverId, String content) {
-        this.senderId = senderId;
-        this.receiverId = receiverId;
-        this.content = content;
-        this.timestamp = LocalDateTime.now();
+    public Message(String senderEmail, String carrierEmail, String message, String roomId, boolean read, LocalDateTime timestamp) {
+        this.roomId = roomId;
+        this.read=read;
+        this.senderEmail = senderEmail;
+        this.carrierEmail = carrierEmail;
+        this.message = message;
+        this.timestamp = timestamp;
     }
 }

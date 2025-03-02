@@ -1,49 +1,42 @@
 package org.samaan.controllers;
 
-
 import org.samaan.model.Message;
-import org.samaan.model.Room;
-import org.samaan.repositories.RoomRepository;
-import org.samaan.services.MessageRequest;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.samaan.services.ChatService;
+import org.samaan.services.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
-import java.time.LocalDateTime;
-
-@Controller
-@CrossOrigin("http://localhost:5173")
+@RestController
+@RequestMapping("/api/chat")
 public class ChatController {
 
-    private RoomRepository roomRepository;
+    @Autowired
+    private ChatService chatService;
 
-    public ChatController(RoomRepository roomRepository) {
-        this.roomRepository = roomRepository;
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    // Save message and notify carrier
+    @MessageMapping("/sendMessage")
+    public void sendMessage(Message chatMessage) {
+        chatService.saveMessage(chatMessage);
+
+        // Notify the carrier in real-time
+        messagingTemplate.convertAndSend("/topic/notifications/" + chatMessage.getCarrierEmail(), "New message from " + chatMessage.getSenderEmail());
+
+        // Send email notification to the carrier
+        notificationService.sendEmailNotification(chatMessage.getCarrierEmail(), "New message received", "You have a new message from " + chatMessage.getSenderEmail());
     }
 
-    @MessageMapping("/sendMessage/{roomId}")
-    @SendTo("/topic/room/{roomId}")
-    public Message sendMessage(
-            @DestinationVariable String roomId,
-            @RequestBody MessageRequest request
-    ) {
-        Room room = roomRepository.findByRoomId(request.getRoomId());
-
-        roomRepository.findByRoomId(request.getRoomId());
-        Message message = new Message();
-        message.setContent(request.getContent());
-        message.setSenderId(request.getSender());
-        message.setTimestamp(LocalDateTime.now());
-
-        if (room != null) {
-            room.getMessages().add(message);
-            roomRepository.save(room);
-        }else{
-            throw new RuntimeException("Room not found");
-        }
-        return message;
+    // Fetch chat history
+    @GetMapping("/history/{roomId}")
+    public List<Message> getChatHistory(@PathVariable String roomId) {
+        return chatService.getChatHistory(roomId);
     }
 }

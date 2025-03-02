@@ -16,12 +16,13 @@ import { AddTrip } from './pages/AddTrip';
 import JoinCreateChat from './components/JoinCreateChat';
 import ChatPage from "./pages/ChatPage.jsx";
 import React from "react";
+import Chat from "./pages/Chat.jsx";
 
 function App() {
   return (
       <div className="min-h-screen bg-gradient-to-r from-purple-300 via-teal-200 to-green-200 flex-grow p-10">
         <Routes>
-          <Route path="/join-chat" element={<JoinCreateChat/>}/>
+          <Route path="/join-chat" element={<Chat/>}/>
           <Route path="/chat" element={<ChatPage/>}/>
           <Route path="/" element={<><Navbar /><Hero /><div className="mt-16"><HowItWorks /></div></>} />
           <Route path="/login" element={<Login />} />

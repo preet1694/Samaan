@@ -1,22 +1,21 @@
-import { httpClient } from "../config/AxiosHelper";
+import axios from "../config/AxiosHelper.jsx";
 
-export const createRoomApi = async (roomDetail) => {
-  const respone = await httpClient.post(`/api/v1/rooms`, roomDetail, {
-    headers: {
-      "Content-Type": "text/plain",
-    },
-  });
-  return respone.data;
+export const findOrCreateRoom = async (email) => {
+  try {
+    const response = await axios.post("/chat/find-or-create-room", { email });
+    return response.data; // Expected to return { roomId: "roomId123" }
+  } catch (error) {
+    console.error("Error finding or creating room:", error);
+    throw error;
+  }
 };
 
-export const joinChatApi = async (roomId) => {
-  const response = await httpClient.get(`/api/v1/rooms/${roomId}`);
-  return response.data;
-};
-
-export const getMessagess = async (roomId, size = 50, page = 0) => {
-  const response = await httpClient.get(
-    `/api/v1/rooms/${roomId}/messages?size=${size}&page=${page}`
-  );
-  return response.data;
+export const getMessages = async (roomId) => {
+  try {
+    const response = await axios.get(`/chat/messages/${roomId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    return [];
+  }
 };
