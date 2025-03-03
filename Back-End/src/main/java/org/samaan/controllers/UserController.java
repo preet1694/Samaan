@@ -62,9 +62,10 @@ public class UserController {
         }
 
         return ResponseEntity.ok(Map.of(
-                "id", Objects.requireNonNullElse(user.getId(), "N/A"),
+                "_id", Objects.requireNonNullElse(user.getId(), "N/A"),
                 "name", Objects.requireNonNullElse(user.getName(), "N/A"),
-                "role", Objects.requireNonNullElse(user.getRole(), "N/A")
+                "role", Objects.requireNonNullElse(user.getRole(), "N/A"),
+                "email", Objects.requireNonNullElse(user.getEmail(), "N/A")
         ));
 
     }

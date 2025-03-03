@@ -47,6 +47,8 @@ export const Login = () => {
       // Store user role and ID in localStorage
       localStorage.setItem("userId", data._id);
       localStorage.setItem("userRole", data.role);
+      localStorage.setItem("email",data.email);
+      localStorage.setItem("name",data.name);
 
       // Navigate based on user role
       if (data.role === "sender") {
