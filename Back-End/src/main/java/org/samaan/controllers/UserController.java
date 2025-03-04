@@ -12,13 +12,11 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5173") // Allow frontend access
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
     @Autowired
     private UserRepository userRepository;
-
-    // Register a new user
     @PostMapping(path = "/register",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {
         Map<String, String> response = new HashMap<>();
@@ -35,7 +33,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Login a user
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
@@ -51,7 +48,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid email or password"));
         }
 
-        // If user exists but has no password (Google login)
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Please log in using Google"));
         }
@@ -62,9 +58,10 @@ public class UserController {
         }
 
         return ResponseEntity.ok(Map.of(
-                "id", Objects.requireNonNullElse(user.getId(), "N/A"),
+                "_id", Objects.requireNonNullElse(user.getId(), "N/A"),
                 "name", Objects.requireNonNullElse(user.getName(), "N/A"),
-                "role", Objects.requireNonNullElse(user.getRole(), "N/A")
+                "role", Objects.requireNonNullElse(user.getRole(), "N/A"),
+                "email", Objects.requireNonNullElse(user.getEmail(), "N/A")
         ));
 
     }

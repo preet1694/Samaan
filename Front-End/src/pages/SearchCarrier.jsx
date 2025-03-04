@@ -41,15 +41,15 @@ export const SearchCarrier = () => {
       // Fetch prices for each carrier
       const priceData = {};
       await Promise.all(
-          response.data.map(async (carrier) => {
+          response.data.map(async (carriers) => {
             try {
               const priceResponse = await axios.get("http://localhost:8080/api/price/calculate", {
                 params: { source: searchParams.source, destination: searchParams.destination },
               });
-              priceData[carrier.id] = priceResponse.data.price;
+              priceData[carriers.id] = priceResponse.data.price;
             } catch (priceError) {
-              console.error("Price calculation failed for carrier:", carrier.id);
-              priceData[carrier.id] = "N/A";
+              console.error("Price calculation failed for carrier:", carriers.id);
+              priceData[carriers.id] = "N/A";
             }
           })
       );
@@ -63,11 +63,15 @@ export const SearchCarrier = () => {
     setLoading(false);
   };
 
-  const handleChat = (carrier) => {
-    if (userRole === "sender") {
-      const carrierEmail = carrier.carrierEmail;
-      navigate(`/join-chat`, { state: { senderEmail, carrierEmail } });
+  const handleChat = (selectedTrip) => {
+    const carrierEmail = selectedTrip.email; // Fetch from trip data
+
+    if (!carrierEmail) {
+      alert("Carrier email not found!");
+      return;
     }
+
+    navigate("/join-chat", { state: { carrierEmail } });
   };
 
   return (

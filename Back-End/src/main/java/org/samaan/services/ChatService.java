@@ -1,9 +1,10 @@
 package org.samaan.services;
 
-import org.samaan.model.Message;
-import org.samaan.repositories.ChatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.samaan.model.Message;
+import org.samaan.repositories.ChatRepository;
+
 import java.util.List;
 
 @Service
@@ -20,3 +21,4 @@ public class ChatService {
         return chatRepository.findByRoomId(roomId);
     }
 }
+

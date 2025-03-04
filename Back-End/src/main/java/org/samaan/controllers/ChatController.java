@@ -1,12 +1,15 @@
 package org.samaan.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.web.bind.annotation.*;
 import org.samaan.model.Message;
 import org.samaan.services.ChatService;
 import org.samaan.services.NotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -19,24 +22,30 @@ public class ChatController {
     @Autowired
     private NotificationService notificationService;
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-
-    // Save message and notify carrier
-    @MessageMapping("/sendMessage")
-    public void sendMessage(Message chatMessage) {
-        chatService.saveMessage(chatMessage);
-
-        // Notify the carrier in real-time
-        messagingTemplate.convertAndSend("/topic/notifications/" + chatMessage.getCarrierEmail(), "New message from " + chatMessage.getSenderEmail());
-
-        // Send email notification to the carrier
-        notificationService.sendEmailNotification(chatMessage.getCarrierEmail(), "New message received", "You have a new message from " + chatMessage.getSenderEmail());
+    // ✅ Save Message to Database
+    @PostMapping("/save")
+    public ResponseEntity<List<Message>> saveMessage(@RequestBody Message message) {
+        chatService.saveMessage(message);
+//        notificationService.sendEmailNotification(
+//                message.getCarrierEmail(),
+//                "New Chat Message",
+//                "You have a new message from " + message.getSenderEmail()
+//        );
+            List<Message> messages = chatService.getChatHistory(message.getRoomId());
+            return ResponseEntity.ok(messages);
     }
 
-    // Fetch chat history
-    @GetMapping("/history/{roomId}")
-    public List<Message> getChatHistory(@PathVariable String roomId) {
+    // ✅ Get Chat History
+    @GetMapping("/history")
+    public List<Message> getChatHistory(@RequestParam String roomId) {
         return chatService.getChatHistory(roomId);
+    }
+
+    // ✅ WebSocket Message Handling
+    @MessageMapping("/chat.sendMessage")
+    @SendTo("/topic/chat/{roomId}")
+    public Message sendMessage(@Payload Message message) {
+        chatService.saveMessage(message);
+        return message;
     }
 }

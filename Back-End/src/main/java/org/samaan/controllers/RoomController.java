@@ -14,7 +14,7 @@ import java.util.List;
 @CrossOrigin("http://localhost:5173")
 public class RoomController {
 
-    private RoomRepository roomRepository;
+    private final RoomRepository roomRepository;
 
     public RoomController(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
