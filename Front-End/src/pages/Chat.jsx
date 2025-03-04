@@ -7,7 +7,6 @@ const Chat = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Fetch sender email from localStorage
     const senderEmail = localStorage.getItem("email");
     const carrierEmail = location.state?.carrierEmail;
 
@@ -15,9 +14,8 @@ const Chat = () => {
     const [message, setMessage] = useState("");
     const [notification, setNotification] = useState("");
     const stompClientRef = useRef(null);
-    const messagesEndRef = useRef(null); // For auto-scrolling
+    const messagesEndRef = useRef(null);
 
-    // Ensure sender and carrier emails exist
     useEffect(() => {
         if (!senderEmail || !carrierEmail) {
             alert("Error: Missing sender or carrier email. Redirecting...");

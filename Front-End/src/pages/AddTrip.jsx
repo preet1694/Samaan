@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AddTrip = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        email: "", // New field
+        email: "",
         carrierName: "",
         source: "",
         destination: "",
@@ -14,21 +14,33 @@ export const AddTrip = () => {
         vehicleType: "",
         capacity: ""
     });
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [sourceSuggestions, setSourceSuggestions] = useState([]);
+    const [destinationSuggestions, setDestinationSuggestions] = useState([]);
 
     // Handle Input Changes
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+
+        if (name === "source" && value.length >= 1) {
+            fetchCitySuggestions(value, "source");
+        } else if (name === "destination" && value.length >= 1) {
+            fetchCitySuggestions(value, "destination");
+        }
     };
 
     // Fetch User Details based on Email
     const fetchUserDetails = async (email) => {
+        if (!email) return;
+
         try {
             const response = await fetch("http://localhost:8080/api/users/getByEmail", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }) // ✅ Wrap email inside an object
+                body: JSON.stringify({ email })
             });
 
             if (!response.ok) {
@@ -39,12 +51,36 @@ export const AddTrip = () => {
             const data = await response.json();
             setFormData((prevData) => ({
                 ...prevData,
-                carrierName: data.name, // ✅ Set carrier name
+                carrierName: data.name,
             }));
         } catch (err) {
             setError(err.message);
             setFormData((prevData) => ({ ...prevData, carrierName: "" }));
         }
+    };
+
+    // Fetch City Suggestions (Updated API endpoint)
+    const fetchCitySuggestions = async (query, field) => {
+        try {
+            const response = await fetch(`http://localhost:8080/api/cities/search?query=${query}`);
+            if (!response.ok) throw new Error("Failed to fetch city suggestions");
+
+            const data = await response.json();
+            if (field === "source") {
+                setSourceSuggestions(data);
+            } else {
+                setDestinationSuggestions(data);
+            }
+        } catch (error) {
+            console.error("Error fetching city suggestions:", error);
+        }
+    };
+
+    // Select City from Suggestions
+    const handleSelectCity = (city, field) => {
+        setFormData({ ...formData, [field]: city });
+        if (field === "source") setSourceSuggestions([]);
+        else setDestinationSuggestions([]);
     };
 
     // Handle Form Submission
@@ -88,7 +124,7 @@ export const AddTrip = () => {
                                     value={formData.email}
                                     onChange={(e) => {
                                         handleChange(e);
-                                        fetchUserDetails(e.target.value); // Fetch details on email change
+                                        fetchUserDetails(e.target.value);
                                     }}
                                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
                                     required
@@ -107,8 +143,60 @@ export const AddTrip = () => {
                                 />
                             </div>
 
+                            {/* Source Field with City Suggestions */}
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700">Source</label>
+                                <input
+                                    type="text"
+                                    name="source"
+                                    value={formData.source}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                    required
+                                />
+                                {sourceSuggestions.length > 0 && (
+                                    <ul className="absolute w-full bg-white border border-gray-300 rounded-md shadow-md mt-1 max-h-40 overflow-y-auto z-10">
+                                        {sourceSuggestions.map((city, index) => (
+                                            <li
+                                                key={index}
+                                                className="p-2 cursor-pointer hover:bg-gray-200"
+                                                onClick={() => handleSelectCity(city, "source")}
+                                            >
+                                                {city}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+
+                            {/* Destination Field with City Suggestions */}
+                            <div className="relative">
+                                <label className="block text-sm font-medium text-gray-700">Destination</label>
+                                <input
+                                    type="text"
+                                    name="destination"
+                                    value={formData.destination}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                    required
+                                />
+                                {destinationSuggestions.length > 0 && (
+                                    <ul className="absolute w-full bg-white border border-gray-300 rounded-md shadow-md mt-1 max-h-40 overflow-y-auto z-10">
+                                        {destinationSuggestions.map((city, index) => (
+                                            <li
+                                                key={index}
+                                                className="p-2 cursor-pointer hover:bg-gray-200"
+                                                onClick={() => handleSelectCity(city, "destination")}
+                                            >
+                                                {city}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+
                             {/* Other Input Fields */}
-                            {["source", "destination", "startLandmark", "endLandmark", "date", "vehicleType", "capacity"].map((key) => (
+                            {["startLandmark", "endLandmark", "date", "vehicleType", "capacity"].map((key) => (
                                 <div key={key}>
                                     <label className="block text-sm font-medium text-gray-700">
                                         {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -125,19 +213,8 @@ export const AddTrip = () => {
                             ))}
                         </div>
                         <div className="mt-6 flex justify-end">
-                            <button
-                                type="submit"
-                                className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700"
-                                disabled={loading}
-                            >
+                            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700" disabled={loading}>
                                 {loading ? "Submitting..." : "Submit"}
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => navigate("/carrier-dashboard")}
-                                className="ml-4 px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600"
-                            >
-                                Cancel
                             </button>
                         </div>
                     </form>
