@@ -30,9 +30,9 @@ public class TripController {
     }
 
     // ✅ Fetch trips by email
-    @GetMapping
-    public ResponseEntity<List<Trip>> getTripsByEmail(@RequestParam String email) {
-        List<Trip> trips = tripService.getTripsByEmail(email);
+    @GetMapping("/getusertrips")
+    public ResponseEntity<List<Trip>> getTripsByEmail(@RequestParam String storedEmail) {
+        List<Trip> trips = tripService.getTripsByEmail(storedEmail);
         if (trips.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

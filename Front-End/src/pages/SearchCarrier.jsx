@@ -3,6 +3,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Search, MessageCircle } from "lucide-react";
 
+function capitalizeFirstLetter(string)
+{
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
 export const SearchCarrier = () => {
   const [searchParams, setSearchParams] = useState({ source: "", destination: "", date: "" });
   const [carriers, setCarriers] = useState([]);
@@ -30,8 +35,8 @@ export const SearchCarrier = () => {
     try {
       const response = await axios.get("http://localhost:8080/api/trips/search", {
         params: {
-          source: searchParams.source,
-          destination: searchParams.destination,
+          source: searchParams.source.toLowerCase(),
+          destination: searchParams.destination.toLowerCase(),
           date: formattedDate,
         },
       });
@@ -187,17 +192,17 @@ export const SearchCarrier = () => {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div className="flex-1">
                       <h3 className="text-lg font-semibold">{carrier.carrierName}</h3>
-                      <p className="text-sm text-gray-500">{carrier.source} → {carrier.destination}</p>
-                      <p className="text-sm text-gray-500">Start Landmark: {carrier.startLandmark}</p>
-                      <p className="text-sm text-gray-500">End Landmark: {carrier.endLandmark}</p>
-                      <p className="text-sm text-gray-500">Vehicle Type: {carrier.vehicleType}</p>
+                      <p className="text-sm text-gray-500">{capitalizeFirstLetter(carrier.source)} → {capitalizeFirstLetter(carrier.destination)}</p>
+                      <p className="text-sm text-gray-500">Start Landmark : {capitalizeFirstLetter(carrier.startLandmark)}</p>
+                      <p className="text-sm text-gray-500">End Landmark : {capitalizeFirstLetter(carrier.endLandmark)}</p>
+                      <p className="text-sm text-gray-500">Vehicle Type : <b>{carrier.vehicleType.toUpperCase()}</b></p>
                     </div>
-                    {userRole === "sender" && (
+                    {(userRole === "sender" && (
                         <button onClick={() => handleChat(carrier)} className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-md flex items-center">
                           <MessageCircle className="h-5 w-5 mr-2" />
                           Chat
                         </button>
-                    )}
+                    ))||<p>Please Log In to Chat</p>}
                   </div>
                 </div>
             ))}

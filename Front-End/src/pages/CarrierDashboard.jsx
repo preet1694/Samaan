@@ -5,40 +5,40 @@ import { Package, MapPin, Calendar, DollarSign } from "lucide-react";
 
 export const CarrierDashboard = () => {
   const navigate = useNavigate();
-  const [trips, setTrips] = useState([]);
-  const [userEmail, setUserEmail] = useState("");
+  const [trips, setTrips] = useState([]); // State to store trips
+  const [userEmail, setUserEmail] = useState(""); // State to store logged-in carrier's email
 
+  let storedEmail;
   useEffect(() => {
+    // Retrieve the logged-in carrier's email from localStorage
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserEmail(user.email);
-      fetchTrips(user.email);
-    }
+    storedEmail = localStorage.getItem("email");
+    fetchTrips(storedEmail);
   }, []);
 
-  // Fetch trips based on logged-in user's email
-  const fetchTrips = async (email) => {
+  // Fetch trips based on logged-in carrier's email
+  const fetchTrips = async (storedEmail) => {
     try {
-      const response = await axios.get("http://localhost:8080/api/trips", {
-        params: { email },
+      const response = await axios.get("http://localhost:8080/api/trips/getusertrips", {
+        params: { storedEmail }, // Send carrier's email as a query parameter
       });
       console.log("Trips Data:", response.data);
-      setTrips(response.data);
+      setTrips(response.data||[]);
     } catch (error) {
       console.error("Error fetching trips:", error);
     }
   };
+
 
   return (
       <div className="min-h-screen bg-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Dashboard Stats */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <DashboardCard icon={<Package />} title="Active Trips" value={trips.length} />
-            <DashboardCard icon={<MapPin />} title="Total Destinations" value={new Set(trips.map(trip => trip.destination)).size} />
-            <DashboardCard icon={<Calendar />} title="Upcoming Trips" value={trips.filter(trip => new Date(trip.date) > new Date()).length} />
-            <DashboardCard icon={<DollarSign />} title="Total Earnings" value={`$${trips.reduce((acc, trip) => acc + trip.price, 0)}`} />
+            {/*<DashboardCard icon={<Package />} title="Active Trips" value={trips.length} />*/}
+            <DashboardCard icon={<MapPin />} title="Total Destinations" value={(new Set(trips.map(trip => trip.destination)).size)||0} />
+            <DashboardCard icon={<Calendar />} title="Upcoming Trips" value={(trips.filter(trip => new Date(trip.date) > new Date()).length)||0} />
+            {/*<DashboardCard icon={<DollarSign />} title="Total Earnings" value={`$${trips.reduce((acc, trip) => acc + trip.price, 0)}`} />*/}
           </div>
 
           {/* Trips Table */}
@@ -65,19 +65,17 @@ export const CarrierDashboard = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Destination</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Capacity</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
                       </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                       {trips.length > 0 ? (
-                          trips.map((trip) => (
-                              <tr key={trip._id}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{trip._id}</td>
+                          trips.map((trip,index) => (
+                              <tr key={trip.id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{index+1}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{trip.source}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{trip.destination}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{trip.date}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{trip.capacity}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${trip.price}</td>
                               </tr>
                           ))
                       ) : (
@@ -115,3 +113,4 @@ const DashboardCard = ({ icon, title, value }) => (
       </div>
     </div>
 );
+

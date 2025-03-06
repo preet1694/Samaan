@@ -43,16 +43,17 @@ export const Login = () => {
 
       const data = await response.json();
       console.log("Login successful:", data);
+      localStorage.setItem("isAuthenticated","true");
 
       // Store user role and ID in localStorage
       localStorage.setItem("userId", data._id);
       localStorage.setItem("userRole", data.role);
       localStorage.setItem("email",data.email);
       localStorage.setItem("name",data.name);
-
+      localStorage.setItem("isAuthenticated",true);
       // Navigate based on user role
       if (data.role === "sender") {
-        navigate("/sender/dashboard");
+        navigate("/search-carrier");
       } else if (data.role === "carrier") {
         navigate("/carrier/dashboard");
       } else {
