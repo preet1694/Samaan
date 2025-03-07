@@ -11,5 +11,5 @@ import java.util.List;
 public interface TripRepository extends MongoRepository<Trip, String> {
     List<Trip> findByEmail(String email);
 
-    List<Trip> findBySourceAndDestinationAndDate(String source, String destination, LocalDate date);
+    List<Trip> findBySourceAndDestinationAndDate(String source, String destination, String date);
 }

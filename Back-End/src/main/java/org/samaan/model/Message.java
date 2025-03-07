@@ -4,7 +4,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @Document(collection = "messages")
@@ -17,6 +16,8 @@ public class Message {
     private String message;
     private boolean read;
     private LocalDateTime timestamp;
+
+    public Message() {}
 
     public Message(String senderEmail, String carrierEmail, String message, String roomId, boolean read, LocalDateTime timestamp) {
         this.roomId = roomId;

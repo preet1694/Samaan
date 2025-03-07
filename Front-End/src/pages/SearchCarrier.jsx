@@ -30,13 +30,14 @@ export const SearchCarrier = () => {
     let formattedDate = "";
     if (searchParams.date) {
       formattedDate = new Date(searchParams.date).toISOString().split("T")[0];
+      // console.log(formattedDate)
     }
 
     try {
       const response = await axios.get("http://localhost:8080/api/trips/search", {
         params: {
-          source: searchParams.source.toLowerCase(),
-          destination: searchParams.destination.toLowerCase(),
+          source: searchParams.source,
+          destination: searchParams.destination,
           date: formattedDate,
         },
       });

@@ -22,7 +22,7 @@ export const CarrierDashboard = () => {
       const response = await axios.get("http://localhost:8080/api/trips/getusertrips", {
         params: { storedEmail }, // Send carrier's email as a query parameter
       });
-      console.log("Trips Data:", response.data);
+      // console.log("Trips Data:", response.data);
       setTrips(response.data||[]);
     } catch (error) {
       console.error("Error fetching trips:", error);
@@ -45,12 +45,20 @@ export const CarrierDashboard = () => {
           <div className="mt-8">
             <div className="flex items-center justify-between">
               <h2 className="text-lg leading-6 font-medium text-gray-900">Your Trips</h2>
-              <button
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                  onClick={() => navigate("/add-trip")}
-              >
-                Add New Trip
-              </button>
+              <div className="flex space-x-4"> {/* Ensures buttons are aligned to the right */}
+                <button
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                    onClick={() => navigate("/chat")}
+                >
+                  Chats
+                </button>
+                <button
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                    onClick={() => navigate("/add-trip")}
+                >
+                  Add New Trip
+                </button>
+              </div>
             </div>
 
             <div className="mt-4 flex flex-col">
@@ -113,4 +121,3 @@ const DashboardCard = ({ icon, title, value }) => (
       </div>
     </div>
 );
-

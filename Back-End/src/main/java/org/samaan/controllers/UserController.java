@@ -18,6 +18,13 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/name")
+    public ResponseEntity<String> getUserName(@RequestParam String email) {
+        Optional<User> user = Optional.ofNullable(userRepository.findByEmail(email));
+        return user.map(value -> ResponseEntity.ok(value.getName()))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
+    }
+
     @PostMapping(path = "/register",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {
         Map<String, String> response = new HashMap<>();

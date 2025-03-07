@@ -5,11 +5,6 @@ import { Package, Search, Send, Clock } from 'lucide-react';
 export const SenderDashboard = () => {
   const navigate = useNavigate(); // Hook for navigation
 
-  const packages = [
-    { id: 1, destination: 'New York', status: 'pending', weight: '2kg', date: '2024-03-20' },
-    { id: 2, destination: 'London', status: 'in-transit', weight: '1.5kg', date: '2024-03-18' },
-    { id: 3, destination: 'Paris', status: 'delivered', weight: '3kg', date: '2024-03-15' },
-  ];
 
   return (
       <div className="min-h-screen bg-gray-100">

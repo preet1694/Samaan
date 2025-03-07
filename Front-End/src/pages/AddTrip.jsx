@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AddTrip = () => {
@@ -196,13 +196,13 @@ export const AddTrip = () => {
                             </div>
 
                             {/* Other Input Fields */}
-                            {["startLandmark", "endLandmark", "date", "vehicleType", "capacity"].map((key) => (
+                            {["startLandmark", "endLandmark", "vehicleType", "capacity"].map((key) => (
                                 <div key={key}>
                                     <label className="block text-sm font-medium text-gray-700">
                                         {key.charAt(0).toUpperCase() + key.slice(1)}
                                     </label>
                                     <input
-                                        type={key === "date" ? "date" : "text"}
+                                        type="text"
                                         name={key}
                                         value={formData[key]}
                                         onChange={handleChange}
@@ -211,6 +211,20 @@ export const AddTrip = () => {
                                     />
                                 </div>
                             ))}
+
+                            {/* Date Field with Future Date Restriction */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Date</label>
+                                <input
+                                    type="date"
+                                    name="date"
+                                    value={formData.date}
+                                    onChange={handleChange}
+                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                    required
+                                    min={new Date().toISOString().split("T")[0]}
+                                />
+                            </div>
                         </div>
                         <div className="mt-6 flex justify-end">
                             <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700" disabled={loading}>

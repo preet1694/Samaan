@@ -18,7 +18,7 @@ export const Login = () => {
     setError(""); // Clear previous errors
 
     try {
-      console.log("Sending login request:", formData);
+      // console.log("Sending login request:", formData);
 
       const response = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
@@ -32,7 +32,7 @@ export const Login = () => {
         }),
       });
 
-      console.log("Response status:", response.status);
+      // console.log("Response status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -42,7 +42,7 @@ export const Login = () => {
       }
 
       const data = await response.json();
-      console.log("Login successful:", data);
+      // console.log("Login successful:", data);
       localStorage.setItem("isAuthenticated","true");
 
       // Store user role and ID in localStorage

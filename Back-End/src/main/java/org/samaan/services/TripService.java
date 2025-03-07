@@ -41,6 +41,6 @@ public class TripService {
     }
 
     public List<Trip> searchTrips(String source, String destination, String date) {
-        return tripRepository.findBySourceAndDestinationAndDate(source, destination, LocalDate.parse(date));
+        return tripRepository.findBySourceAndDestinationAndDate(source, destination, date);
     }
 }
