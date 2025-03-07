@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const baseURL = "http://localhost:8080/api"; // Change if needed
+export const baseURL = "https://samaan-pooling.onrender.com/api"; // Change if needed
 
 const axiosInstance = axios.create({
   baseURL,
