@@ -24,7 +24,7 @@ export const Register = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:8080/api/users/register', {
+      const response = await axios.post('https://samaan-pooling.onrender.com/api/users/register', {
         name: formData.name,
         email: formData.email,
         password: formData.password,

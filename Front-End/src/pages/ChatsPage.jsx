@@ -14,7 +14,7 @@ const ChatsPage = () => {
 
     const fetchChats = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/chat/all", { params: { carrierEmail } });
+            const response = await axios.get("https://samaan-pooling.onrender.com/api/chat/all", { params: { carrierEmail } });
             setChats(response.data);
 
             // Fetch names for each sender email
@@ -31,7 +31,7 @@ const ChatsPage = () => {
             emails.map(async (email) => {
                 if (!updatedNames[email]) {
                     try {
-                        const res = await axios.get("http://localhost:8080/api/users/name", { params: { email } });
+                        const res = await axios.get("https://samaan-pooling.onrender.com/api/users/name", { params: { email } });
                         updatedNames[email] = res.data;
                     } catch (error) {
                         console.error(`Error fetching name for ${email}:`, error);

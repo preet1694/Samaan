@@ -34,7 +34,7 @@ export const SearchCarrier = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:8080/api/trips/search", {
+      const response = await axios.get("https://samaan-pooling.onrender.com/api/trips/search", {
         params: {
           source: searchParams.source,
           destination: searchParams.destination,
@@ -48,7 +48,7 @@ export const SearchCarrier = () => {
       await Promise.all(
           response.data.map(async (carrier) => {
             try {
-              const priceResponse = await axios.get("http://localhost:8080/api/price/calculate", {
+              const priceResponse = await axios.get("https://samaan-pooling.onrender.com/api/price/calculate", {
                 params: { source: searchParams.source, destination: searchParams.destination },
               });
               priceData[carrier.id] = priceResponse.data.price;
@@ -87,7 +87,7 @@ export const SearchCarrier = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:8080/api/cities/search", { params: { query } });
+      const response = await axios.get("https://samaan-pooling.onrender.com/api/cities/search", { params: { query } });
       if (type === "source") {
         setSourceSuggestions(response.data);
       } else {

@@ -20,7 +20,7 @@ export const Profile = () => {
         }
 
         const response = await axios.post(
-            "http://localhost:8080/api/users/getByEmail",
+            "https://samaan-pooling.onrender.com/api/users/getByEmail",
             { email: storedEmail }
         );
 
@@ -38,7 +38,7 @@ export const Profile = () => {
 
   const updateProfile = async () => {
     try {
-      await axios.post("http://localhost:8080/api/users/update", profile);
+      await axios.post("https://samaan-pooling.onrender.com/api/users/update", profile);
       alert("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {

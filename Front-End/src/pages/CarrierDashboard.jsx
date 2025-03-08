@@ -19,7 +19,7 @@ export const CarrierDashboard = () => {
   // Fetch trips based on logged-in carrier's email
   const fetchTrips = async (storedEmail) => {
     try {
-      const response = await axios.get("http://localhost:8080/api/trips/getusertrips", {
+      const response = await axios.get("https://samaan-pooling.onrender.com/api/trips/getusertrips", {
         params: { storedEmail }, // Send carrier's email as a query parameter
       });
       // console.log("Trips Data:", response.data);

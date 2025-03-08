@@ -37,7 +37,7 @@ export const AddTrip = () => {
         if (!email) return;
 
         try {
-            const response = await fetch("http://localhost:8080/api/users/getByEmail", {
+            const response = await fetch("https://samaan-pooling.onrender.com/api/users/getByEmail", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
@@ -62,7 +62,7 @@ export const AddTrip = () => {
     // Fetch City Suggestions (Updated API endpoint)
     const fetchCitySuggestions = async (query, field) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/cities/search?query=${query}`);
+            const response = await fetch(`https://samaan-pooling.onrender.com/api/cities/search?query=${query}`);
             if (!response.ok) throw new Error("Failed to fetch city suggestions");
 
             const data = await response.json();
@@ -90,7 +90,7 @@ export const AddTrip = () => {
         setError("");
 
         try {
-            const response = await fetch("http://localhost:8080/api/trips/add", {
+            const response = await fetch("https://samaan-pooling.onrender.com/api/trips/add", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)

@@ -44,7 +44,7 @@ const Chat = () => {
 
     const fetchUserName = async (email, setName) => {
         try {
-            const response = await axios.get("http://localhost:8080/api/users/name", { params: { email } });
+            const response = await axios.get("https://samaan-pooling.onrender.com/api/users/name", { params: { email } });
             setName(response.data);
         } catch (error) {
             // console.error(`Error fetching name for ${email}:`, error);
@@ -55,7 +55,7 @@ const Chat = () => {
     useEffect(() => {
         if (!roomId) return;
 
-        const stompClient = Stomp.over(new SockJS("http://localhost:8080/ws"));
+        const stompClient = Stomp.over(new SockJS("https://samaan-pooling.onrender.com/ws"));
 
         stompClient.connect({}, () => {
             // console.log("✅ Connected to WebSocket");
@@ -76,7 +76,7 @@ const Chat = () => {
             });
 
             // Fetch chat history only once
-            fetch(`http://localhost:8080/api/chat/history?roomId=${roomId}`)
+            fetch(`https://samaan-pooling.onrender.com/api/chat/history?roomId=${roomId}`)
                 .then((res) => res.json())
                 .then((data) => setMessages(data))
                 .catch((err) => console.error("Error fetching chat history:", err));
@@ -95,7 +95,7 @@ const Chat = () => {
     useEffect(() => {
         if (!receiverEmail) return;
 
-        const socket = new SockJS("http://localhost:8080/ws");
+        const socket = new SockJS("https://samaan-pooling.onrender.com/ws");
         const stompClient = Stomp.over(socket);
 
         stompClient.connect({}, () => {
