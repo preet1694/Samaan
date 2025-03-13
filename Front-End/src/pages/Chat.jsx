@@ -56,7 +56,7 @@ const Chat = () => {
     if (!roomId) return;
 
     const stompClient = new Client({
-      brokerURL: "ws://samaan.onrender.com/ws",
+      brokerURL: "wss://samaan.onrender.com/ws",
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
