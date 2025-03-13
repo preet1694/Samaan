@@ -7,7 +7,7 @@ const Chat = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  const roomId = queryParams.get("roomId") || "";
+  const roomId = localStorage.getItem("roomId") || queryParams.get("roomId") || "";
 
   const loggedInUserEmail = localStorage.getItem("email"); // The actual chat sender's email
   const userRole = localStorage.getItem("userRole"); // Can be "sender" or "carrier"
