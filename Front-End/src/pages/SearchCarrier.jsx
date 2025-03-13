@@ -76,6 +76,8 @@ export const SearchCarrier = () => {
       return;
     }
 
+    localStorage.setItem("carrierEmail", carrierEmail);
+
     navigate("/join-chat", { state: { carrierEmail } });
   };
 

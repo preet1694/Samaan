@@ -18,7 +18,8 @@ const Chat = () => {
     const emails = roomId.split("_");
     return emails[0] === loggedInUserEmail ? emails[1] : emails[0];
   };
-  const receiverEmail = getReceiverEmail();
+  const receiverEmail =
+    localStorage.getItem("receiverEmail") || getReceiverEmail();
 
   // State variables
   const [senderName, setSenderName] = useState("");
@@ -136,9 +137,9 @@ const Chat = () => {
       timestamp: new Date().toISOString(),
     };
 
-    console.log(
-      `📨 Sending Message | Sender: ${loggedInUserEmail}, Receiver: ${receiverEmail}, Role: ${userRole}`
-    );
+    // console.log(
+    //   `📨 Sending Message | Sender: ${loggedInUserEmail}, Receiver: ${receiverEmail}, Role: ${userRole}`
+    // );
 
     stompClientRef.current.publish({
       destination: "/app/chat.sendMessage",
