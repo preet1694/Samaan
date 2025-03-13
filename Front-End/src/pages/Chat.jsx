@@ -19,7 +19,7 @@ const Chat = () => {
     return emails[0] === loggedInUserEmail ? emails[1] : emails[0];
   };
   const receiverEmail =
-    localStorage.getItem("receiverEmail") || getReceiverEmail();
+    localStorage.getItem("carrierEmail") || getReceiverEmail();
 
   // State variables
   const [senderName, setSenderName] = useState("");
