@@ -24,7 +24,7 @@ export const Profile = () => {
             { email: storedEmail }
         );
 
-        console.log("User Data:", response.data);
+        // console.log("User Data:", response.data);
         setProfile(response.data);
       } catch (error) {
         console.error("Error fetching profile:", error);
