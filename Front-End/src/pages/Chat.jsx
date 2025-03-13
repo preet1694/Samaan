@@ -31,6 +31,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (!roomId || !loggedInUserEmail || !receiverEmail) {
+      console.log(roomId, loggedInUserEmail, receiverEmail);
       alert("Error: Missing chat details. Redirecting...");
       navigate("/chats");
       return;
