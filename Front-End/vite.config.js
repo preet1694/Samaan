@@ -10,6 +10,7 @@ export default defineConfig({
   preview: {
     port: process.env.PORT || 3000, // Ensure it picks up Render's dynamic port
     host: "0.0.0.0", // Make sure it's externally accessible
+    allowedHosts: ['samaan.onrender.com', 'localhost'] // Add this line to fix the error
   },
   define: {
     global: "window",
