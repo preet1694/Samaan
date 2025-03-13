@@ -68,18 +68,39 @@ export const SearchCarrier = () => {
     setLoading(false);
   };
 
-  const handleChat = (selectedTrip) => {
-    const carrierEmail = selectedTrip.email; // Fetch from trip data
+  const handleChat = async (selectedTrip) => {
+  const carrierEmail = selectedTrip.email;
+  const senderEmail = localStorage.getItem("email");
 
-    if (!carrierEmail) {
-      alert("Carrier email not found!");
+  if (!carrierEmail || !senderEmail) {
+    alert("Email details missing. Please log in.");
+    return;
+  }
+
+  try {
+    // Request backend to create or get existing chat room
+    const response = await axios.post(
+      "https://samaan-pooling.onrender.com/api/v1/rooms",
+      null,
+      {
+        params: { senderEmail, carrierEmail },
+      }
+    );
+
+    const roomId = response.data.roomId;
+    if (!roomId) {
+      alert("Failed to get chat room ID.");
       return;
     }
 
-    localStorage.setItem("carrierEmail", carrierEmail);
-
-    navigate("/join-chat", { state: { carrierEmail } });
-  };
+    // Store room ID in localStorage and navigate to chat page
+    localStorage.setItem("roomId", roomId);
+    navigate("/join-chat", { state: { roomId, carrierEmail } });
+  } catch (error) {
+    console.error("Error creating chat room:", error);
+    alert("Error creating chat room. Please try again.");
+  }
+};
 
   // Fetch city suggestions
   const fetchCitySuggestions = async (query, type) => {
