@@ -95,7 +95,7 @@ export const SearchCarrier = () => {
 
     // Store room ID in localStorage and navigate to chat page
     localStorage.setItem("roomId", roomId);
-    navigate("/join-chat/${roomId}", { state: { roomId, carrierEmail } });
+    navigate(`/join-chat/${roomId}`, { state: { roomId, carrierEmail } });
   } catch (error) {
     console.error("Error creating chat room:", error);
     alert("Error creating chat room. Please try again.");
