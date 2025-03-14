@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client"; // ✅ Import SockJS
 import axios from "axios";
 
 const Chat = () => {
@@ -55,8 +56,9 @@ const Chat = () => {
   useEffect(() => {
     if (!roomId) return;
 
+    const socket = new SockJS("https://samaan-pooling.onrender.com/ws"); // ✅ Use SockJS
     const stompClient = new Client({
-      brokerURL: `https://samaan-pooling.onrender.com/ws`,
+      webSocketFactory: () => socket, // ✅ Use SockJS connection
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
