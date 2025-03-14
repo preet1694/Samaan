@@ -22,7 +22,7 @@ function App() {
   return (
       <div className="min-h-screen bg-gradient-to-r from-purple-300 via-teal-200 to-green-200 flex-grow p-10">
           <Routes>
-            <Route path="/join-chat" element={<><Navbar/><Chat/></>}/>
+            <Route path="/join-chat/:roomId" element={<><Navbar/><Chat/></>}/>
             <Route path="/chat" element={<><Navbar/><ChatsPage/></>}/>
             <Route path="/" element={<><Navbar /><Hero /><div className="mt-16"><HowItWorks /></div></>} />
             <Route path="/login" element={<Login />} />
