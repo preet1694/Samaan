@@ -105,7 +105,7 @@ const Chat = () => {
     };
 
     stompClientRef.current.publish({
-      destination: "/app/chat.sendMessage",
+      destination: `/app/chat.sendMessage`,
       body: JSON.stringify(chatMessage),
     });
 
