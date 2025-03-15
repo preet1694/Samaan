@@ -4,53 +4,59 @@ import axios from "axios";
 
 const ChatsPage = () => {
   const navigate = useNavigate();
-  const [chats, setChats] = useState({});
+  const [chats, setChats] = useState({}); // Stores chats
   const [names, setNames] = useState({}); // Stores email-to-name mapping
-  const email = localStorage.getItem("email");
+  const email = localStorage.getItem("email"); // Carrier's email
 
   useEffect(() => {
-    console.log(email);
-    fetchChats();
-  }, []);
+    if (email) {
+      fetchChats();
+    }
+  }, [email]);
 
   const fetchChats = async () => {
     try {
-      console.log(email);
       const response = await axios.get(
         "https://samaan-pooling.onrender.com/api/chat/rooms",
         { params: { email } }
       );
-      console.log(response);
       setChats(response.data);
 
-      // Fetch names for each sender email
+      // Extract unique sender emails
       const uniqueEmails = [...new Set(Object.keys(response.data))];
-      fetchNames(uniqueEmails);
+      if (uniqueEmails.length > 0) {
+        fetchNames(uniqueEmails);
+      }
     } catch (error) {
       console.error("Error fetching chats:", error);
     }
   };
 
   const fetchNames = async (emails) => {
-    const updatedNames = { ...names };
-    await Promise.all(
-      emails.map(async (email) => {
-        if (!updatedNames[email]) {
-          try {
-            console.log(email);
-            const res = await axios.get(
-              "https://samaan-pooling.onrender.com/api/users/name",
-              { params: { email } }
-            );
-            updatedNames[email] = res.data;
-          } catch (error) {
-            console.error(`Error fetching name for ${email}:`, error);
-            updatedNames[email] = email; // Fallback to email
+    try {
+      const nameMapping = { ...names }; // Clone existing names
+
+      await Promise.all(
+        emails.map(async (senderEmail) => {
+          if (!nameMapping[senderEmail]) {
+            try {
+              const res = await axios.get(
+                "https://samaan-pooling.onrender.com/api/users/name",
+                { params: { email: senderEmail } }
+              );
+              nameMapping[senderEmail] = res.data || senderEmail; // Fallback to email
+            } catch (error) {
+              console.error(`Error fetching name for ${senderEmail}:`, error);
+              nameMapping[senderEmail] = senderEmail;
+            }
           }
-        }
-      })
-    );
-    setNames(updatedNames);
+        })
+      );
+
+      setNames(nameMapping); // Update state once all names are fetched
+    } catch (error) {
+      console.error("Error in fetchNames:", error);
+    }
   };
 
   return (
@@ -64,7 +70,7 @@ const ChatsPage = () => {
                 key={senderEmail}
                 className="p-4 border-b cursor-pointer hover:bg-gray-100"
                 onClick={() =>
-                  navigate(`/join-chat?roomId=${senderEmail}_${carrierEmail}`)
+                  navigate(`/join-chat?roomId=${senderEmail}_${email}`)
                 }
               >
                 <span className="font-medium text-indigo-600">
@@ -72,7 +78,7 @@ const ChatsPage = () => {
                 </span>
                 <p className="text-sm text-gray-500">
                   Last message:{" "}
-                  {chats[senderEmail][chats[senderEmail].length - 1]?.content}
+                  {chats[senderEmail]?.[chats[senderEmail].length - 1]?.content || "No messages"}
                 </p>
               </li>
             ))
