@@ -22,8 +22,12 @@ const ChatsPage = () => {
       );
       setChats(response.data);
 
-      // Extract unique sender emails
-      const uniqueEmails = [...new Set(Object.keys(response.data))];
+      // Extract unique sender emails correctly
+      const uniqueEmails = Object.keys(response.data).filter(
+        (senderEmail) => senderEmail.includes("@")
+      );
+
+      console.log("Extracted Emails:", uniqueEmails); // Debugging
 
       if (uniqueEmails.length > 0) {
         fetchNames(uniqueEmails);
@@ -41,6 +45,7 @@ const ChatsPage = () => {
         emails.map(async (senderEmail) => {
           if (!updatedNames[senderEmail]) {
             try {
+              console.log(`Fetching name for: ${senderEmail}`); // Debugging
               const res = await axios.get(
                 "https://samaan-pooling.onrender.com/api/users/name",
                 { params: { email: senderEmail } } // ✅ Corrected param
