@@ -24,9 +24,13 @@ const ChatsPage = () => {
       setChats(response.data);
 
       // Extract unique sender emails correctly
-      const uniqueEmails = Object.keys(response.data).filter(
-        (senderEmail) => senderEmail.includes("@")
-      );
+     const uniqueEmails = response.data
+      .filter((roomId) => roomId && roomId.includes("_")) // Remove nulls and invalid data
+      .map((roomId) => roomId.split("_")[0]); // Extract sender's email
+
+    console.log("Extracted Emails:", uniqueEmails); // Debugging
+
+    setChats(response.data);
 
       console.log("Extracted Emails:", uniqueEmails); // Debugging
 
