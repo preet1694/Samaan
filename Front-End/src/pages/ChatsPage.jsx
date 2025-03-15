@@ -20,6 +20,7 @@ const ChatsPage = () => {
         "https://samaan-pooling.onrender.com/api/chat/rooms",
         { params: { email } }
       );
+      console.log(response.data);
       setChats(response.data);
 
       // Extract unique sender emails correctly
