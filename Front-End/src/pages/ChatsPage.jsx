@@ -6,7 +6,7 @@ const ChatsPage = () => {
   const navigate = useNavigate();
   const [chats, setChats] = useState({});
   const [names, setNames] = useState({}); // Stores email-to-name mapping
-  const carrierEmail = localStorage.getItem("email");
+  const email = localStorage.getItem("email");
 
   useEffect(() => {
     fetchChats();
@@ -16,7 +16,7 @@ const ChatsPage = () => {
     try {
       const response = await axios.get(
         "https://samaan-pooling.onrender.com/api/chat/all",
-        { params: { carrierEmail } }
+        { params: { email } }
       );
       setChats(response.data);
 
