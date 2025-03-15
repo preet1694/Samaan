@@ -9,15 +9,18 @@ const ChatsPage = () => {
   const email = localStorage.getItem("email");
 
   useEffect(() => {
+    console.log(email);
     fetchChats();
   }, []);
 
   const fetchChats = async () => {
     try {
+      console.log(email);
       const response = await axios.get(
         "https://samaan-pooling.onrender.com/api/chat/rooms",
         { params: { email } }
       );
+      console.log(response);
       setChats(response.data);
 
       // Fetch names for each sender email
@@ -34,6 +37,7 @@ const ChatsPage = () => {
       emails.map(async (email) => {
         if (!updatedNames[email]) {
           try {
+            console.log(email);
             const res = await axios.get(
               "https://samaan-pooling.onrender.com/api/users/name",
               { params: { email } }
