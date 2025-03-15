@@ -15,7 +15,7 @@ const ChatsPage = () => {
   const fetchChats = async () => {
     try {
       const response = await axios.get(
-        "https://samaan-pooling.onrender.com/api/chat/all",
+        "https://samaan-pooling.onrender.com/api/chat/rooms",
         { params: { email } }
       );
       setChats(response.data);
