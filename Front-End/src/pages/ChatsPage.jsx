@@ -24,6 +24,7 @@ const ChatsPage = () => {
 
       // Extract unique sender emails
       const uniqueEmails = [...new Set(Object.keys(response.data))];
+
       if (uniqueEmails.length > 0) {
         fetchNames(uniqueEmails);
       }
@@ -34,26 +35,28 @@ const ChatsPage = () => {
 
   const fetchNames = async (emails) => {
     try {
-      const nameMapping = { ...names }; // Clone existing names
+      const updatedNames = { ...names };
 
       await Promise.all(
         emails.map(async (senderEmail) => {
-          if (!nameMapping[senderEmail]) {
+          if (!updatedNames[senderEmail]) {
             try {
               const res = await axios.get(
                 "https://samaan-pooling.onrender.com/api/users/name",
-                { params: { email: senderEmail } }
+                { params: { email: senderEmail } } // ✅ Corrected param
               );
-              nameMapping[senderEmail] = res.data || senderEmail; // Fallback to email
+
+              updatedNames[senderEmail] =
+                res.data !== "User not found" ? res.data : senderEmail; // Fallback to email if user not found
             } catch (error) {
-              console.error(`Error fetching name for ${senderEmail}:`, error);
-              nameMapping[senderEmail] = senderEmail;
+              console.error(`Error fetching name for ${senderEmail}:`, error.message);
+              updatedNames[senderEmail] = senderEmail; // Fallback to email
             }
           }
         })
       );
 
-      setNames(nameMapping); // Update state once all names are fetched
+      setNames(updatedNames);
     } catch (error) {
       console.error("Error in fetchNames:", error);
     }
