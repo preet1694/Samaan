@@ -152,6 +152,8 @@ export const SearchCarrier = () => {
               <div key={carrier.id} className="bg-white rounded-lg shadow-lg p-6">
                 <h3 className="text-lg font-semibold">{carrier.carrierName}</h3>
                 <p className="text-sm text-gray-500">{capitalizeFirstLetter(carrier.source)} → {capitalizeFirstLetter(carrier.destination)}</p>
+                <p className="text-sm text-gray-500">Start Landmark : {capitalizeFirstLetter(carrier.startLandmark)}</p>
+                <p className="text-sm text-gray-500">End Landmark : {capitalizeFirstLetter(carrier.endLandmark)}</p>
                 <p className="text-sm text-gray-500">Vehicle Type: <b>{carrier.vehicleType.toUpperCase()}</b></p>
                 <p className="text-sm text-green-600 font-semibold">Estimated Price: ₹{prices[carrier.id] || "Calculating..."}</p>
                 
