@@ -10,7 +10,7 @@ export const SenderDashboard = () => {
   const [selectedTrips, setSelectedTrips] = useState([]);
   const [ratings, setRatings] = useState({});
   const [feedbacks, setFeedbacks] = useState({});
-  const [ratedTrips, setRatedTrips] = useState({}); // Track submitted trips
+  const [ratedTrips, setRatedTrips] = useState({});
 
   useEffect(() => {
     fetchSelectedTrips();
