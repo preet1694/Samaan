@@ -25,6 +25,8 @@ export const SearchCarrier = () => {
 
   const navigate = useNavigate();
 
+  const todayDate = new Date().toISOString().split("T")[0];
+
   const senderEmail = localStorage.getItem("email");
   const userRole = localStorage.getItem("userRole");
 
@@ -224,6 +226,7 @@ export const SearchCarrier = () => {
               </label>
               <input
                 type="date"
+                min={todayDate}
                 className="block w-full pl-3 sm:text-sm border-gray-300 rounded-md"
                 value={searchParams.date}
                 onChange={(e) =>
@@ -280,7 +283,7 @@ export const SearchCarrier = () => {
                     <MessageCircle className="h-5 w-5 mr-2" />
                     Chat
                   </button>
-                )) || <p>Please Log In to Chat</p>}
+                )) || <p>Please Log In as a Sender to Chat</p>}
 
                 {userRole === "sender" && (
                   <button
