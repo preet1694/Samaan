@@ -38,7 +38,7 @@ export const AddTrip = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/users/getByEmail",
+        "https://samaan-pooling.onrender.com/api/users/getByEmail",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -66,7 +66,7 @@ export const AddTrip = () => {
   const fetchCitySuggestions = async (query, field) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/cities/search?query=${query}`
+        `https://samaan-pooling.onrender.com/api/cities/search?query=${query}`
       );
       if (!response.ok) throw new Error("Failed to fetch city suggestions");
 
