@@ -11,21 +11,28 @@ export const SenderDashboard = () => {
   const [ratings, setRatings] = useState({});
   const [feedbacks, setFeedbacks] = useState({});
   const [ratedTrips, setRatedTrips] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchSelectedTrips();
-  }, []);
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const tripsPerPage = 5;
 
   const fetchSelectedTrips = async () => {
     try {
       const response = await axios.get(
         `https://samaan-pooling.onrender.com/api/trips/sender/${senderEmail}`
       );
-      setSelectedTrips(response.data);
+
+      // 🆕 Sort by latest date first
+      const sortedTrips = response.data.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+      setSelectedTrips(sortedTrips);
 
       const ratingsResponse = await axios.get(
         `https://samaan-pooling.onrender.com/api/trips/ratings/${senderEmail}`
       );
+
       const fetchedRatings = ratingsResponse.data.reduce((acc, trip) => {
         acc[trip.id] = trip.rating;
         return acc;
@@ -37,7 +44,7 @@ export const SenderDashboard = () => {
       }, {});
 
       const fetchedRatedTrips = ratingsResponse.data.reduce((acc, trip) => {
-        acc[trip.id] = true; // Mark as rated if exists in DB
+        acc[trip.id] = true;
         return acc;
       }, {});
 
@@ -46,8 +53,14 @@ export const SenderDashboard = () => {
       setRatedTrips(fetchedRatedTrips);
     } catch (error) {
       console.error("Error fetching trips or ratings:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSelectedTrips();
+  }, []);
 
   const submitRatingAndFeedback = async (tripId) => {
     const rating = ratings[tripId];
@@ -64,153 +77,191 @@ export const SenderDashboard = () => {
         { tripId, rating, feedback },
         { headers: { "Content-Type": "application/json" } }
       );
-
-      setRatedTrips((prev) => ({ ...prev, [tripId]: true })); // Mark as rated after submission
+      setRatedTrips((prev) => ({ ...prev, [tripId]: true }));
     } catch (error) {
       console.error("Error submitting rating and feedback:", error);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h2 className="text-2xl font-bold text-gray-900">Your Selected Trips</h2>
+  // Pagination Logic
+  const indexOfLastTrip = currentPage * tripsPerPage;
+  const indexOfFirstTrip = indexOfLastTrip - tripsPerPage;
+  const currentTrips = selectedTrips.slice(indexOfFirstTrip, indexOfLastTrip);
+  const totalPages = Math.ceil(selectedTrips.length / tripsPerPage);
 
-      <div className="mt-4 flex flex-col">
-        <div className="overflow-x-auto">
-          <div className="py-2 inline-block min-w-full">
-            <div className="shadow overflow-hidden border-b border-gray-200 rounded-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Trip ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Carrier
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Source
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Destination
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Rating & Feedback
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {selectedTrips.map((trip) => (
-                    <tr key={trip.id}>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        #{trip.id}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {trip.carrierName}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {trip.source}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {trip.destination}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                            trip.carrierCompleted
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {trip.carrierCompleted ? (
-                            <>
-                              <CheckCircle className="h-4 w-4 inline-block mr-1" />{" "}
-                              Completed
-                            </>
-                          ) : (
-                            <>
-                              <Clock className="h-4 w-4 inline-block mr-1" />{" "}
-                              Pending
-                            </>
-                          )}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {trip.senderSelected && trip.carrierCompleted ? (
-                          <div className="flex flex-col">
-                            <ReactStars
-                              count={5}
-                              size={24}
-                              half={false}
-                              value={ratings[trip.id] || 0}
-                              onChange={(newRating) =>
-                                !ratedTrips[trip.id] &&
-                                setRatings((prev) => ({
-                                  ...prev,
-                                  [trip.id]: newRating,
-                                }))
-                              }
-                              color2={"#ffd700"}
-                              edit={!ratedTrips[trip.id]} // Disable stars if already rated
-                            />
-                            <textarea
-                              className="mt-2 p-2 w-full border rounded bg-white text-gray-800"
-                              placeholder="Write your feedback..."
-                              value={feedbacks[trip.id] || ""}
-                              onChange={(e) =>
-                                !ratedTrips[trip.id] &&
-                                setFeedbacks((prev) => ({
-                                  ...prev,
-                                  [trip.id]: e.target.value,
-                                }))
-                              }
-                              disabled={ratedTrips[trip.id]} // Disable feedback input if already rated
-                            />
-                            {!ratedTrips[trip.id] ? (
-                              <button
-                                className={`mt-2 px-4 py-2 rounded text-white ${
-                                  !ratings[trip.id]
-                                    ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-blue-500 hover:bg-blue-600"
-                                }`}
-                                onClick={() => submitRatingAndFeedback(trip.id)}
-                                disabled={!ratings[trip.id]}
-                              >
-                                Submit
-                              </button>
-                            ) : (
-                              <span className="text-green-600 text-sm font-semibold mt-2">
-                                Feedback Submitted
-                              </span>
-                            )}
-                          </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#f3f4fd] to-white px-4 md:px-8 py-10 transition-all duration-500 ease-in-out">
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-8 animate-fade-in">
+        Your Selected Trips
+      </h2>
+
+      <div className="overflow-x-auto rounded-xl shadow-md bg-white animate-slide-up-fade transition-all duration-500">
+        <table className="min-w-full divide-y divide-gray-200 text-sm md:text-base">
+          <thead className="bg-indigo-100">
+            <tr>
+              <TableHeader></TableHeader>
+              <TableHeader>Trip ID</TableHeader>
+              <TableHeader>Carrier</TableHeader>
+              <TableHeader>Source</TableHeader>
+              <TableHeader>Destination</TableHeader>
+              <TableHeader>Status</TableHeader>
+              <TableHeader>Rating & Feedback</TableHeader>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-100">
+            {loading ? (
+              Array.from({ length: tripsPerPage }).map((_, index) => (
+                <SkeletonRow key={index} />
+              ))
+            ) : selectedTrips.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="text-center py-6 text-gray-500">
+                  No trips found.
+                </td>
+              </tr>
+            ) : (
+              currentTrips.map((trip, index) => (
+                <tr
+                  key={trip.id}
+                  className="hover:bg-gray-50 transition-all duration-300 ease-in-out"
+                >
+                  <TableData>{indexOfFirstTrip + index + 1}</TableData>
+                  <TableData className="break-words max-w-[120px]">
+                    #{trip.id || "-"}
+                  </TableData>
+                  <TableData>{trip.carrierName || "-"}</TableData>
+                  <TableData>{trip.source || "-"}</TableData>
+                  <TableData>{trip.destination || "-"}</TableData>
+                  <TableData>
+                    <span
+                      className={`px-3 py-1 text-xs font-medium rounded-full inline-flex items-center ${
+                        trip.carrierCompleted
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {trip.carrierCompleted ? (
+                        <>
+                          <CheckCircle className="h-4 w-4 mr-1" /> Completed
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="h-4 w-4 mr-1" /> Pending
+                        </>
+                      )}
+                    </span>
+                  </TableData>
+                  <TableData>
+                    {trip.senderSelected && trip.carrierCompleted ? (
+                      <div className="flex flex-col space-y-2 animate-fade-in">
+                        <ReactStars
+                          count={5}
+                          size={20}
+                          half={false}
+                          value={ratings[trip.id] || 0}
+                          onChange={(newRating) =>
+                            !ratedTrips[trip.id] &&
+                            setRatings((prev) => ({
+                              ...prev,
+                              [trip.id]: newRating,
+                            }))
+                          }
+                          color2={"#ffd700"}
+                          edit={!ratedTrips[trip.id]}
+                        />
+                        <textarea
+                          className="p-2 border border-gray-300 rounded bg-gray-50 resize-none text-sm text-gray-700"
+                          placeholder="Write your feedback..."
+                          value={feedbacks[trip.id] || ""}
+                          onChange={(e) =>
+                            !ratedTrips[trip.id] &&
+                            setFeedbacks((prev) => ({
+                              ...prev,
+                              [trip.id]: e.target.value,
+                            }))
+                          }
+                          disabled={ratedTrips[trip.id]}
+                        />
+                        {!ratedTrips[trip.id] ? (
+                          <button
+                            className={`mt-1 px-4 py-1.5 rounded text-white text-xs md:text-sm transition-all duration-300 ${
+                              !ratings[trip.id]
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-indigo-600 hover:bg-indigo-700"
+                            }`}
+                            onClick={() => submitRatingAndFeedback(trip.id)}
+                            disabled={!ratings[trip.id]}
+                          >
+                            Submit
+                          </button>
                         ) : (
-                          <span className="text-gray-500 text-sm">
-                            Not available
+                          <span className="text-green-600 text-sm font-semibold">
+                            Feedback Submitted
                           </span>
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                  {selectedTrips.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan="6"
-                        className="text-center py-4 text-gray-500"
-                      >
-                        No trips found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 text-sm italic">
+                        Not available
+                      </span>
+                    )}
+                  </TableData>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+
+      {/* Pagination Controls */}
+      {!loading && selectedTrips.length > tripsPerPage && (
+        <div className="flex justify-center items-center mt-6 space-x-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="px-4 py-2 bg-indigo-500 text-white text-sm rounded disabled:opacity-50"
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="text-gray-700 text-sm">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            className="px-4 py-2 bg-indigo-500 text-white text-sm rounded disabled:opacity-50"
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
+
+// Table Header Cell
+const TableHeader = ({ children }) => (
+  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+    {children}
+  </th>
+);
+
+// Table Data Cell
+const TableData = ({ children, className = "" }) => (
+  <td className={`px-4 py-3 text-gray-700 ${className}`}>{children}</td>
+);
+
+// Skeleton Row for Loading
+const SkeletonRow = () => (
+  <tr>
+    {Array.from({ length: 7 }).map((_, idx) => (
+      <td key={idx} className="px-4 py-3">
+        <div className="relative overflow-hidden h-4 rounded bg-gray-200 w-5/6 mx-auto">
+          <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+        </div>
+      </td>
+    ))}
+  </tr>
+);

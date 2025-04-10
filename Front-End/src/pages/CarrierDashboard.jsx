@@ -5,17 +5,17 @@ import { Package, MapPin, Calendar, DollarSign } from "lucide-react";
 
 export const CarrierDashboard = () => {
   const navigate = useNavigate();
-  const [trips, setTrips] = useState([]); 
-  const [userEmail, setUserEmail] = useState(""); 
+  const [trips, setTrips] = useState([]);
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
-    
     const storedEmail = localStorage.getItem("email");
-    setUserEmail(storedEmail);
-    fetchTrips(storedEmail);
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+      fetchTrips(storedEmail);
+    }
   }, []);
 
-  
   const fetchTrips = async (email) => {
     try {
       const response = await axios.get(
@@ -25,12 +25,12 @@ export const CarrierDashboard = () => {
         }
       );
       setTrips(response.data || []);
+      console.log("Fetched trips:", response.data);
     } catch (error) {
       console.error("Error fetching trips:", error);
     }
   };
 
-  
   const markTripAsCompleted = async (tripId) => {
     try {
       await axios.put(
@@ -46,27 +46,44 @@ export const CarrierDashboard = () => {
     }
   };
 
+  const today = new Date(new Date().toDateString());
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+        {/* Dashboard Cards */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <DashboardCard
             icon={<MapPin />}
             title="Total Destinations"
-            value={new Set(trips.map((trip) => trip.destination)).size || 0}
+            value={
+              new Set(
+                trips
+                  .filter((trip) => new Date(trip.date) >= today)
+                  .map((trip) => trip.destination)
+              ).size || 0
+            }
           />
           <DashboardCard
             icon={<Calendar />}
             title="Upcoming Trips"
             value={
-              trips.filter((trip) => new Date(trip.date) > new Date()).length ||
-              0
+              trips.filter((trip) => new Date(trip.date) > today).length || 0
             }
+          />
+          <DashboardCard
+            icon={<DollarSign />}
+            title="Completed Trips"
+            value={trips.filter((trip) => trip.carrierCompleted).length || 0}
+          />
+          <DashboardCard
+            icon={<Package />}
+            title="Pending Trips"
+            value={trips.filter((trip) => !trip.carrierCompleted).length || 0}
           />
         </div>
 
-        
+        {/* Trip Table */}
         <div className="mt-8">
           <div className="flex items-center justify-between">
             <h2 className="text-lg leading-6 font-medium text-gray-900">
@@ -143,7 +160,7 @@ export const CarrierDashboard = () => {
                                   Completed
                                 </span>
                               ) : (
-                                <span className="text-yellow-300 font-semibold">
+                                <span className="text-yellow-400 font-semibold">
                                   Pending
                                 </span>
                               )}
@@ -185,7 +202,6 @@ export const CarrierDashboard = () => {
     </div>
   );
 };
-
 
 const DashboardCard = ({ icon, title, value }) => (
   <div className="bg-white overflow-hidden shadow rounded-lg">
