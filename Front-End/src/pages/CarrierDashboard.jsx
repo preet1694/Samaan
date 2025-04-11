@@ -46,6 +46,36 @@ export const CarrierDashboard = () => {
     }
   };
 
+  const requestCancelTrip = async (tripId) => {
+    try {
+      await axios.post(
+        `https://samaan-pooling.onrender.com/api/trips/${tripId}/cancel`,
+        null,
+        {
+          params: { role: "carrier" },
+        }
+      );
+      fetchTrips(userEmail); // Refresh trips
+    } catch (error) {
+      console.error("Error requesting cancellation:", error);
+    }
+  };
+
+  const respondToCancelRequest = async (tripId, agree) => {
+    try {
+      await axios.post(
+        `https://samaan-pooling.onrender.com/api/trips/${tripId}/respond-cancel`,
+        null,
+        {
+          params: { role: "carrier", agree: agree.toString() },
+        }
+      );
+      fetchTrips(userEmail); // Refresh trips
+    } catch (error) {
+      console.error("Error responding to cancellation:", error);
+    }
+  };
+
   const today = new Date(new Date().toDateString());
 
   return (
@@ -157,31 +187,130 @@ export const CarrierDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {trip.carrierCompleted ? (
                                 <span className="text-green-600 font-semibold">
-                                  Completed
+                                  Already Completed!!
+                                </span>
+                              ) : trip.cancelled ? (
+                                <span className="text-red-600 font-semibold">
+                                  Cancelled
+                                </span>
+                              ) : trip.senderRequestedCancel &&
+                                !trip.cancellationConfirmed ? (
+                                <div className="space-y-1">
+                                  <span className="text-orange-500 font-medium block">
+                                    Sender requested cancellation
+                                  </span>
+                                  <div className="flex space-x-2">
+                                    <button
+                                      className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs"
+                                      onClick={() =>
+                                        respondToCancelRequest(trip.id, true)
+                                      }
+                                    >
+                                      Accept
+                                    </button>
+                                    <button
+                                      className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs"
+                                      onClick={() =>
+                                        respondToCancelRequest(trip.id, false)
+                                      }
+                                    >
+                                      Reject
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : trip.carrierRequestedCancel &&
+                                !trip.cancellationConfirmed ? (
+                                <span className="text-orange-400 font-medium">
+                                  Cancellation Requested
+                                </span>
+                              ) : new Date(trip.date) > new Date() ? (
+                                <span className="text-yellow-600">
+                                  Trip not started yet
+                                </span>
+                              ) : !trip.senderSelected ? (
+                                <span className="text-red-500 font-medium">
+                                  No sender selected yet
                                 </span>
                               ) : (
-                                <span className="text-yellow-400 font-semibold">
-                                  Pending
-                                </span>
+                                <div className="space-y-1">
+                                  <button
+                                    className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md w-full"
+                                    onClick={() => markTripAsCompleted(trip.id)}
+                                  >
+                                    Mark as Completed
+                                  </button>
+                                  <button
+                                    className="px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded-md w-full"
+                                    onClick={() => requestCancelTrip(trip.id)}
+                                  >
+                                    Request Cancel
+                                  </button>
+                                </div>
                               )}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-     {trip.carrierCompleted ? (
-    <span className="text-green-600 font-semibold">Already Completed!!</span>
-  ) : new Date(trip.date) > new Date() ? (
-    <span className="text-yellow-600">Trip not started yet</span>
-  ) : !trip.senderSelected ? (
-    <span className="text-red-500 font-medium">No sender selected yet</span>
-  ) : (
-    <button
-      className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md"
-      onClick={() => markTripAsCompleted(trip.id)}
-    >
-      Mark as Completed
-    </button>
-  )}
-</td>
 
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {trip.carrierCompleted ? (
+                                <span className="text-green-600 font-semibold">
+                                  Already Completed!!
+                                </span>
+                              ) : trip.cancelled ? (
+                                <span className="text-red-600 font-semibold">
+                                  Cancelled
+                                </span>
+                              ) : trip.cancellationRequestedBy === "sender" ? (
+                                <div className="space-y-1">
+                                  <span className="text-orange-500 font-medium block">
+                                    Sender requested cancellation
+                                  </span>
+                                  <div className="flex space-x-2">
+                                    <button
+                                      className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs"
+                                      onClick={() =>
+                                        respondToCancelRequest(trip.id, true)
+                                      }
+                                    >
+                                      Accept
+                                    </button>
+                                    <button
+                                      className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs"
+                                      onClick={() =>
+                                        respondToCancelRequest(trip.id, false)
+                                      }
+                                    >
+                                      Reject
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : trip.cancellationRequestedBy === "carrier" ? (
+                                <span className="text-orange-400 font-medium">
+                                  Cancellation Requested
+                                </span>
+                              ) : new Date(trip.date) > new Date() ? (
+                                <span className="text-yellow-600">
+                                  Trip not started yet
+                                </span>
+                              ) : !trip.senderSelected ? (
+                                <span className="text-red-500 font-medium">
+                                  No sender selected yet
+                                </span>
+                              ) : (
+                                <div className="space-y-1">
+                                  <button
+                                    className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md w-full"
+                                    onClick={() => markTripAsCompleted(trip.id)}
+                                  >
+                                    Mark as Completed
+                                  </button>
+                                  <button
+                                    className="px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded-md w-full"
+                                    onClick={() => requestCancelTrip(trip.id)}
+                                  >
+                                    Request Cancel
+                                  </button>
+                                </div>
+                              )}
+                            </td>
                           </tr>
                         ))
                       ) : (

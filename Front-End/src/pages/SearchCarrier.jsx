@@ -22,18 +22,108 @@ const SkeletonCard = () => (
   </div>
 );
 
+const AutoSuggestInput = ({ label, value, onSelect, onValidChange }) => {
+  const [inputValue, setInputValue] = useState(value || "");
+  const [suggestions, setSuggestions] = useState([]);
+  const [touched, setTouched] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+
+  const fetchSuggestions = debounce(async (query) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const res = await axios.get(
+        "https://samaan-pooling.onrender.com/api/cities/search",
+        { params: { query } }
+      );
+      setSuggestions(res.data);
+    } catch (err) {
+      console.error("City fetch failed", err);
+    }
+  }, 300);
+
+  const validateCity = (cityName) => {
+    const match = suggestions.some(
+      (city) => city.toLowerCase() === cityName.trim().toLowerCase()
+    );
+    setIsValid(match);
+    onValidChange(match);
+    return match;
+  };
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    setInputValue(val);
+    setTouched(true);
+    fetchSuggestions(val);
+    setIsValid(false); // Reset validity until validated again
+    onValidChange(false);
+  };
+
+  const handleSelect = (city) => {
+    setInputValue(city);
+    setSuggestions([]);
+    setIsValid(true);
+    setTouched(true);
+    onSelect(city);
+    onValidChange(true);
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
+    validateCity(inputValue);
+  };
+
+  return (
+    <div className="relative">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <input
+        type="text"
+        className="block w-full pl-3 py-2 text-base sm:text-[17px] border border-gray-300 rounded-md shadow-sm"
+        placeholder="City"
+        value={inputValue}
+        onChange={handleChange}
+        onBlur={handleBlur}
+      />
+      {suggestions.length > 0 && (
+        <ul className="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded-md shadow-lg max-h-40 overflow-auto text-base">
+          {suggestions.map((city, index) => (
+            <li
+              key={index}
+              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={() => handleSelect(city)}
+            >
+              {city}
+            </li>
+          ))}
+        </ul>
+      )}
+      {touched && inputValue && !isValid && (
+        <p className="text-sm text-red-500 mt-1 ml-1">
+          Please select a city from the suggestions.
+        </p>
+      )}
+    </div>
+  );
+};
+
 export const SearchCarrier = () => {
   const [searchParams, setSearchParams] = useState({
     source: "",
     destination: "",
     date: "",
   });
+  const [isValidSource, setIsValidSource] = useState(false);
+  const [isValidDestination, setIsValidDestination] = useState(false);
+
   const [carriers, setCarriers] = useState([]);
   const [prices, setPrices] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [sourceSuggestions, setSourceSuggestions] = useState([]);
-  const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [selectedTripId, setSelectedTripId] = useState(null);
 
   const navigate = useNavigate();
@@ -44,7 +134,7 @@ export const SearchCarrier = () => {
   const handleSearch = async () => {
     setLoading(true);
     setError(null);
-    let formattedDate = searchParams.date
+    const formattedDate = searchParams.date
       ? new Date(searchParams.date).toISOString().split("T")[0]
       : "";
 
@@ -122,99 +212,31 @@ export const SearchCarrier = () => {
     }
   };
 
-  const fetchCitySuggestions = debounce(async (query, type) => {
-    if (!query) {
-      type === "source"
-        ? setSourceSuggestions([])
-        : setDestinationSuggestions([]);
-      return;
-    }
-    try {
-      const response = await axios.get(
-        "https://samaan-pooling.onrender.com/api/cities/search",
-        { params: { query } }
-      );
-      type === "source"
-        ? setSourceSuggestions(response.data)
-        : setDestinationSuggestions(response.data);
-    } catch (error) {
-      console.error("Error fetching city suggestions:", error);
-    }
-  }, 300);
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Search Bar */}
+        {/* Search Form */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700">
-                From
-              </label>
-              <input
-                type="text"
-                className="block w-full pl-3 py-2 sm:text-sm border-gray-300 rounded-md shadow-sm"
-                placeholder="City"
-                value={searchParams.source}
-                onChange={(e) => {
-                  setSearchParams({ ...searchParams, source: e.target.value });
-                  fetchCitySuggestions(e.target.value, "source");
-                }}
-              />
-              {sourceSuggestions.length > 0 && (
-                <ul className="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded-md shadow-lg max-h-40 overflow-auto">
-                  {sourceSuggestions.map((city, index) => (
-                    <li
-                      key={index}
-                      className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => {
-                        setSearchParams({ ...searchParams, source: city });
-                        setSourceSuggestions([]);
-                      }}
-                    >
-                      {city}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <AutoSuggestInput
+              label="From"
+              value={searchParams.source}
+              onSelect={(val) =>
+                setSearchParams({ ...searchParams, source: val })
+              }
+              onValidChange={setIsValidSource}
+            />
 
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700">
-                To
-              </label>
-              <input
-                type="text"
-                className="block w-full pl-3 py-2 sm:text-sm border-gray-300 rounded-md shadow-sm"
-                placeholder="City"
-                value={searchParams.destination}
-                onChange={(e) => {
-                  setSearchParams({
-                    ...searchParams,
-                    destination: e.target.value,
-                  });
-                  fetchCitySuggestions(e.target.value, "destination");
-                }}
-              />
-              {destinationSuggestions.length > 0 && (
-                <ul className="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded-md shadow-lg max-h-40 overflow-auto">
-                  {destinationSuggestions.map((city, index) => (
-                    <li
-                      key={index}
-                      className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => {
-                        setSearchParams({ ...searchParams, destination: city });
-                        setDestinationSuggestions([]);
-                      }}
-                    >
-                      {city}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <AutoSuggestInput
+              label="To"
+              value={searchParams.destination}
+              onSelect={(val) =>
+                setSearchParams({ ...searchParams, destination: val })
+              }
+              onValidChange={setIsValidDestination}
+            />
 
+            {/* Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Date
@@ -230,9 +252,17 @@ export const SearchCarrier = () => {
               />
             </div>
           </div>
+
+          {/* Search Button */}
           <button
             onClick={handleSearch}
-            className="w-full md:w-auto mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md flex items-center transition duration-200"
+            disabled={!isValidSource || !isValidDestination}
+            className={`w-full md:w-auto mt-4 px-5 py-2.5 rounded-lg flex items-center justify-center font-semibold text-[16px] transition duration-300
+                        ${
+                          !isValidSource || !isValidDestination
+                            ? "bg-indigo-300 cursor-not-allowed text-white"
+                            : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                        }`}
           >
             <Search className="h-5 w-5 mr-2" />
             Search Carriers
@@ -292,22 +322,28 @@ export const SearchCarrier = () => {
                           <MessageCircle className="h-5 w-5 mr-2" />
                           Chat
                         </button>
-                        <button
-                          onClick={() => handleSelectCarrier(carrier)}
-                          className={`px-4 py-2 rounded-md flex items-center transition 
-                            ${
-                              selectedTripId === carrier.id
-                                ? "bg-green-600 hover:bg-green-700"
-                                : "bg-blue-600 hover:bg-blue-700"
-                            } text-white`}
-                        >
-                          {selectedTripId === carrier.id && (
-                            <CheckCircle className="h-5 w-5 mr-2" />
-                          )}
-                          {selectedTripId === carrier.id
-                            ? "Selected"
-                            : "Select Carrier"}
-                        </button>
+
+                        {selectedTripId === carrier.id ? (
+                          <div className="flex flex-col items-start gap-2">
+                            <div className="flex items-center text-green-600 font-semibold">
+                              <CheckCircle className="h-5 w-5 mr-1" />
+                              Selected
+                            </div>
+                            <button
+                              onClick={() => setSelectedTripId(null)}
+                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded-md transition"
+                            >
+                              Unselect
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => handleSelectCarrier(carrier)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition"
+                          >
+                            Select Carrier
+                          </button>
+                        )}
                       </div>
                     ) : (
                       <p className="text-sm text-gray-500 mt-4 md:mt-0">
