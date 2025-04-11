@@ -86,7 +86,20 @@ const Chat = () => {
         `https://samaan-pooling.onrender.com/api/chat/history?roomId=${roomId}`
       )
         .then((res) => res.json())
-        .then((data) => setMessages(data))
+        .then((data) => {
+          setMessages(data);
+          axios.post(
+            "https://samaan-pooling.onrender.com/api/chat/mark-read",
+            {},
+            {
+              params: {
+                roomId: roomId,
+                email: loggedInUserEmail,
+              },
+            }
+          );
+        })
+
         .catch(console.error);
     });
 
