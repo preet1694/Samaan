@@ -166,19 +166,22 @@ export const CarrierDashboard = () => {
                               )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {trip.carrierCompleted ? (
-                                <span className="text-green-600 font-semibold">
-                                  Already Completed!!
-                                </span>
-                              ) : (
-                                <button
-                                  className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md"
-                                  onClick={() => markTripAsCompleted(trip.id)}
-                                >
-                                  Mark as Completed
-                                </button>
-                              )}
-                            </td>
+     {trip.carrierCompleted ? (
+    <span className="text-green-600 font-semibold">Already Completed!!</span>
+  ) : new Date(trip.date) > new Date() ? (
+    <span className="text-yellow-600">Trip not started yet</span>
+  ) : !trip.senderSelected ? (
+    <span className="text-red-500 font-medium">No sender selected yet</span>
+  ) : (
+    <button
+      className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md"
+      onClick={() => markTripAsCompleted(trip.id)}
+    >
+      Mark as Completed
+    </button>
+  )}
+</td>
+
                           </tr>
                         ))
                       ) : (
