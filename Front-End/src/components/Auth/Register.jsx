@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Mail, Lock, User, Package } from "lucide-react";
-import GoogleAuth from "./GoogleAuth";
+import { GoogleAuth } from "./GoogleAuth";
 
 export const Register = () => {
   const navigate = useNavigate();

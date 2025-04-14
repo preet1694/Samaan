@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 
-const GoogleAuth = () => {
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+export const GoogleAuth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -99,7 +102,7 @@ const GoogleAuth = () => {
 
       {!isNewUser ? (
         <div>
-          <h2>Login with Google</h2>
+          <GoogleLogin />
           <div id="google-signin-button"></div>
           <script
             src="https://accounts.google.com/gsi/client"
@@ -107,7 +110,7 @@ const GoogleAuth = () => {
             defer
             onLoad={() => {
               google.accounts.id.initialize({
-                client_id: "YOUR_GOOGLE_CLIENT_ID",
+                client_id: VITE_GOOGLE_CLIENT_ID,
                 callback: handleGoogleLoginSuccess,
               });
               google.accounts.id.renderButton(
@@ -151,5 +154,3 @@ const GoogleAuth = () => {
     </div>
   );
 };
-
-export default GoogleAuth;

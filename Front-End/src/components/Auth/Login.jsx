@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Package } from "lucide-react";
-import GoogleAuth from "./GoogleAuth";
+import { GoogleAuth } from "./GoogleAuth";
 
 export const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -123,31 +123,6 @@ export const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                 />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="ml-3 block text-lg text-gray-900"
-                >
-                  Remember me
-                </label>
-              </div>
-              <div className="text-lg">
-                <Link
-                  to="/forgot-password"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  Forgot your password?
-                </Link>
               </div>
             </div>
 
