@@ -16,6 +16,7 @@ export const SenderDashboard = () => {
   const [cancelledTrips, setCancelledTrips] = useState({});
   const [cancelStatus, setCancelStatus] = useState({});
   const [cancelModalTripId, setCancelModalTripId] = useState(null);
+  const [cancelActionModalTripId, setCancelActionModalTripId] = useState(null); // For accept/decline modal
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -131,6 +132,60 @@ export const SenderDashboard = () => {
     }
   };
 
+  const acceptCancelTrip = async (tripId) => {
+    try {
+      await axios.post(
+        `https://samaan-pooling.onrender.com/api/trips/${tripId}/respond-cancel?role=sender&agree=true`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setCancelStatus((prev) => ({
+        ...prev,
+        [tripId]: {
+          requestedBy: senderEmail,
+          status: "cancelled",
+        },
+      }));
+      toast.success("Cancellation accepted.");
+    } catch (error) {
+      console.error("Error accepting cancellation:", error);
+      toast.error("Failed to accept cancellation.");
+    } finally {
+      setCancelActionModalTripId(null);
+    }
+  };
+
+  const declineCancelTrip = async (tripId) => {
+    try {
+      await axios.post(
+        `https://samaan-pooling.onrender.com/api/trips/${tripId}/respond-cancel?role=sender&agree=false`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setCancelStatus((prev) => ({
+        ...prev,
+        [tripId]: {
+          requestedBy: senderEmail,
+          status: "pending",
+        },
+      }));
+      toast.success("Cancellation declined.");
+    } catch (error) {
+      console.error("Error declining cancellation:", error);
+      toast.error("Failed to decline cancellation.");
+    } finally {
+      setCancelActionModalTripId(null);
+    }
+  };
+
   const indexOfLastTrip = currentPage * tripsPerPage;
   const indexOfFirstTrip = indexOfLastTrip - tripsPerPage;
   const currentTrips = selectedTrips.slice(indexOfFirstTrip, indexOfLastTrip);
@@ -138,10 +193,18 @@ export const SenderDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f3f4fd] to-white px-4 md:px-8 py-10">
-      <Toaster position="top-right" />
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-8">
-        Your Selected Trips
-      </h2>
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 animate-fade-in-left">
+          Your Selected Trips
+        </h2>
+
+        <button
+          onClick={() => navigate("/chat")}
+          className="animate-fade-in-right px-4 py-2 bg-indigo-600 text-white rounded-md shadow hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105"
+        >
+          Your Chats
+        </button>
+      </div>
 
       <div className="overflow-x-auto bg-white shadow rounded-xl">
         <table className="min-w-full divide-y divide-gray-200 text-sm md:text-base">
@@ -247,26 +310,36 @@ export const SenderDashboard = () => {
                               onClick={() => submitRatingAndFeedback(trip.id)}
                               className="mt-1 px-4 py-1.5 text-sm rounded text-white bg-indigo-600 hover:bg-indigo-700"
                             >
-                              Submit
+                              Submit Rating & Feedback
                             </button>
                           ) : (
-                            <span className="text-green-600 text-sm font-semibold">
+                            <p className="text-sm text-gray-500 mt-1">
                               Feedback Submitted
-                            </span>
+                            </p>
                           )}
                         </div>
-                      ) : showCancel ? (
-                        <button
-                          onClick={() => cancelTrip(trip.id)}
-                          className="bg-red-100 text-red-600 text-sm px-4 py-2 rounded-full hover:bg-red-200 transition"
-                        >
-                          Cancel Trip
-                        </button>
-                      ) : cancelInfo?.status === "requested" ? (
-                        <span className="text-yellow-600 text-sm font-medium">
-                          Cancel Requested
-                        </span>
-                      ) : null}
+                      ) : (
+                        <>
+                          {showCancel && (
+                            <button
+                              onClick={() =>
+                                setCancelActionModalTripId(trip.id)
+                              }
+                              className="text-sm text-red-600 hover:text-red-800"
+                            >
+                              Request Cancellation
+                            </button>
+                          )}
+                          {cancelInfo?.status === "requested" && (
+                            <button
+                              onClick={() => cancelTrip(trip.id)}
+                              className="text-xs text-blue-600 hover:text-blue-800"
+                            >
+                              Cancel Request
+                            </button>
+                          )}
+                        </>
+                      )}
                     </TableData>
                   </tr>
                 );
@@ -274,54 +347,55 @@ export const SenderDashboard = () => {
             )}
           </tbody>
         </table>
+
+        {selectedTrips.length > tripsPerPage && (
+          <div className="flex items-center justify-center py-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="p-2 text-gray-600 bg-white border rounded-lg hover:bg-gray-100"
+            >
+              Prev
+            </button>
+            <span className="mx-4 text-gray-600">{`Page ${currentPage} of ${totalPages}`}</span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+              }
+              disabled={currentPage === totalPages}
+              className="p-2 text-gray-600 bg-white border rounded-lg hover:bg-gray-100"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
-      {!loading && selectedTrips.length > tripsPerPage && (
-        <div className="flex justify-center mt-6 space-x-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            className="px-4 py-2 bg-indigo-500 text-white text-sm rounded disabled:opacity-50"
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <span className="text-gray-700 text-sm">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            className="px-4 py-2 bg-indigo-500 text-white text-sm rounded disabled:opacity-50"
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
-
-      {cancelModalTripId && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full animate-fade-in">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Confirm Cancellation
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to request cancellation? It will only be
-              completed when both sides agree.
+      {/* Confirmation modal for cancel action */}
+      {cancelActionModalTripId && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p className="text-lg font-semibold mb-4">
+              Do you want to accept or decline this cancellation request?
             </p>
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-between">
               <button
-                onClick={() => setCancelModalTripId(null)}
-                className="px-4 py-1.5 text-sm rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+                onClick={() => acceptCancelTrip(cancelActionModalTripId)}
+                className="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-md"
               >
-                No
+                Accept
               </button>
               <button
-                onClick={() => confirmCancelTrip(cancelModalTripId)}
-                className="px-4 py-1.5 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+                onClick={() => declineCancelTrip(cancelActionModalTripId)}
+                className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md"
               >
-                Yes, Request Cancel
+                Decline
+              </button>
+              <button
+                onClick={() => setCancelActionModalTripId(null)}
+                className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md"
+              >
+                Cancel
               </button>
             </div>
           </div>
@@ -332,21 +406,23 @@ export const SenderDashboard = () => {
 };
 
 const TableHeader = ({ children }) => (
-  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+  <th className="px-4 py-3 text-left font-semibold text-gray-600">
     {children}
   </th>
 );
 
-const TableData = ({ children, className = "" }) => (
-  <td className={`px-4 py-3 text-gray-700 ${className}`}>{children}</td>
+const TableData = ({ children }) => (
+  <td className="px-4 py-3 text-gray-700">{children}</td>
 );
 
 const SkeletonRow = () => (
-  <tr>
-    {Array.from({ length: 7 }).map((_, idx) => (
-      <td key={idx} className="px-4 py-3">
-        <div className="h-4 bg-gray-200 rounded w-5/6 mx-auto animate-pulse" />
-      </td>
-    ))}
+  <tr className="animate-pulse">
+    <td className="px-4 py-3 bg-gray-200"></td>
+    <td className="px-4 py-3 bg-gray-200"></td>
+    <td className="px-4 py-3 bg-gray-200"></td>
+    <td className="px-4 py-3 bg-gray-200"></td>
+    <td className="px-4 py-3 bg-gray-200"></td>
+    <td className="px-4 py-3 bg-gray-200"></td>
+    <td className="px-4 py-3 bg-gray-200"></td>
   </tr>
 );

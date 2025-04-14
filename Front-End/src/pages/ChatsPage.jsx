@@ -17,24 +17,22 @@ const ChatsPage = () => {
       try {
         const response = await axios.get(
           "https://samaan-pooling.onrender.com/api/chat/all",
-          {
-            params: { carrierEmail },
-          }
+          { params: { carrierEmail } }
         );
 
-        setChats(response.data);
+        const chatData = response.data || {};
+        setChats(chatData);
 
         const unread = {};
-        for (const email in response.data) {
-          const msgs = response.data[email];
-          const hasUnread = msgs.some(
-            (msg) => msg.senderEmail === email && msg.read === false
+        for (const sender in chatData) {
+          const msgs = chatData[sender];
+          unread[sender] = msgs.some(
+            (msg) => msg.senderEmail === sender && msg.read === false
           );
-          unread[email] = hasUnread;
         }
         setUnreadMap(unread);
 
-        const uniqueEmails = [...new Set(Object.keys(response.data))];
+        const uniqueEmails = Object.keys(chatData);
         await fetchNames(uniqueEmails);
       } catch (error) {
         console.error("Error fetching chats:", error);
@@ -44,6 +42,8 @@ const ChatsPage = () => {
     };
 
     fetchChats();
+    const interval = setInterval(fetchChats, 10000); // Refresh every 10 seconds
+    return () => clearInterval(interval);
   }, [carrierEmail]);
 
   const fetchNames = async (emails) => {
@@ -52,9 +52,7 @@ const ChatsPage = () => {
       try {
         const res = await axios.get(
           "https://samaan-pooling.onrender.com/api/users/name",
-          {
-            params: { email },
-          }
+          { params: { email } }
         );
         updatedNames[email] = res.data;
       } catch {
@@ -64,56 +62,88 @@ const ChatsPage = () => {
     setNames(updatedNames);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-[80vh]">
-        <div className="animate-pulse text-lg text-gray-600">
-          Loading chats...
-        </div>
-      </div>
-    );
-  }
+  const renderSkeleton = () => (
+    <ul className="space-y-4">
+      {[...Array(4)].map((_, idx) => (
+        <li
+          key={idx}
+          className="p-5 bg-gray-200 animate-pulse rounded-xl shadow-sm"
+        >
+          <div className="h-4 bg-gray-300 rounded w-1/3 mb-2" />
+          <div className="h-3 bg-gray-300 rounded w-2/3" />
+        </li>
+      ))}
+    </ul>
+  );
+
+  const sortedSenders = Object.keys(chats).sort((a, b) => {
+    const aMsgs = chats[a];
+    const bMsgs = chats[b];
+    const aLast = aMsgs[aMsgs.length - 1]?.timestamp || 0;
+    const bLast = bMsgs[bMsgs.length - 1]?.timestamp || 0;
+    return new Date(bLast) - new Date(aLast);
+  });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-indigo-700 mb-6">
-        Chats with Senders
-      </h1>
-      <ul className="space-y-4">
-        {Object.keys(chats).map((senderEmail) => {
-          const isUnread = unreadMap[senderEmail];
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6">
+      <div className="max-w-5xl mx-auto bg-white p-4 sm:p-6 rounded-2xl shadow-lg animate-fadeIn">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center sm:text-left">
+          Chats with Senders
+        </h2>
 
-          return (
-            <li
-              key={senderEmail}
-              onClick={() =>
-                navigate(`/join-chat?roomId=${senderEmail}_${carrierEmail}`)
-              }
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-5 rounded-xl shadow-sm transition-all duration-200 cursor-pointer ${
-                isUnread
-                  ? "bg-indigo-100 border-l-4 border-indigo-500 animate-pulse-fast"
-                  : "bg-gray-50 hover:shadow-md hover:bg-gray-100"
-              }`}
-            >
-              <div>
-                <div className="text-lg sm:text-xl font-semibold text-indigo-700 truncate">
-                  {names[senderEmail] || senderEmail}
-                </div>
-                <div className="text-sm text-gray-600 mt-1 truncate max-w-full">
-                  Last message:{" "}
-                  <span className={`italic ${isUnread ? "font-bold" : ""}`}>
-                    {chats[senderEmail][chats[senderEmail].length - 1]
-                      ?.message || "No message"}
-                  </span>
-                </div>
-              </div>
-              <div className="text-xs text-gray-400 sm:text-sm hidden sm:block">
-                Tap to open chat →
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+        {loading ? (
+          renderSkeleton()
+        ) : sortedSenders.length > 0 ? (
+          <ul className="space-y-4">
+            {sortedSenders.map((senderEmail) => {
+              const messages = chats[senderEmail] || [];
+              const lastMessage = messages[messages.length - 1];
+              const isUnread = unreadMap[senderEmail];
+
+              return (
+                <li
+                  key={senderEmail}
+                  onClick={() =>
+                    navigate(`/join-chat?roomId=${senderEmail}_${carrierEmail}`)
+                  }
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-5 rounded-xl shadow-sm transition-all duration-200 cursor-pointer ${
+                    isUnread
+                      ? "bg-indigo-100 border-l-4 border-indigo-500 animate-pulse-fast"
+                      : "bg-gray-50 hover:shadow-md hover:bg-gray-100"
+                  }`}
+                >
+                  <div className="flex-1">
+                    <div className="text-lg sm:text-xl font-semibold text-indigo-700 truncate">
+                      {names[senderEmail] || senderEmail}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1 truncate max-w-full">
+                      {lastMessage ? (
+                        <span
+                          className={`italic ${isUnread ? "font-bold" : ""}`}
+                        >
+                          {lastMessage.message}
+                        </span>
+                      ) : (
+                        <span className="italic text-gray-400">
+                          No messages yet
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1 min-w-[150px] text-right">
+                    <span className="text-xs text-gray-400">{senderEmail}</span>
+                    <span className="text-xs text-gray-400 hidden sm:block">
+                      Tap to open chat →
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="text-center text-gray-500 py-8">No chats available.</p>
+        )}
+      </div>
     </div>
   );
 };

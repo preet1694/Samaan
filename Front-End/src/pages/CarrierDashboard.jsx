@@ -7,6 +7,8 @@ export const CarrierDashboard = () => {
   const navigate = useNavigate();
   const [trips, setTrips] = useState([]);
   const [userEmail, setUserEmail] = useState("");
+  const [cancelModalTripId, setCancelModalTripId] = useState(null);
+  const [completeModalTripId, setCompleteModalTripId] = useState(null);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
@@ -234,77 +236,18 @@ export const CarrierDashboard = () => {
                               ) : (
                                 <div className="space-y-1">
                                   <button
-                                    className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md w-full"
-                                    onClick={() => markTripAsCompleted(trip.id)}
+                                    className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md w-fit"
+                                    onClick={() =>
+                                      setCompleteModalTripId(trip.id)
+                                    }
                                   >
                                     Mark as Completed
                                   </button>
                                   <button
-                                    className="px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded-md w-full"
-                                    onClick={() => requestCancelTrip(trip.id)}
-                                  >
-                                    Request Cancel
-                                  </button>
-                                </div>
-                              )}
-                            </td>
-
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {trip.carrierCompleted ? (
-                                <span className="text-green-600 font-semibold">
-                                  Already Completed!!
-                                </span>
-                              ) : trip.cancelled ? (
-                                <span className="text-red-600 font-semibold">
-                                  Cancelled
-                                </span>
-                              ) : trip.cancellationRequestedBy === "sender" ? (
-                                <div className="space-y-1">
-                                  <span className="text-orange-500 font-medium block">
-                                    Sender requested cancellation
-                                  </span>
-                                  <div className="flex space-x-2">
-                                    <button
-                                      className="px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs"
-                                      onClick={() =>
-                                        respondToCancelRequest(trip.id, true)
-                                      }
-                                    >
-                                      Accept
-                                    </button>
-                                    <button
-                                      className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs"
-                                      onClick={() =>
-                                        respondToCancelRequest(trip.id, false)
-                                      }
-                                    >
-                                      Reject
-                                    </button>
-                                  </div>
-                                </div>
-                              ) : trip.cancellationRequestedBy === "carrier" ? (
-                                <span className="text-orange-400 font-medium">
-                                  Cancellation Requested
-                                </span>
-                              ) : new Date(trip.date) > new Date() ? (
-                                <span className="text-yellow-600">
-                                  Trip not started yet
-                                </span>
-                              ) : !trip.senderSelected ? (
-                                <span className="text-red-500 font-medium">
-                                  No sender selected yet
-                                </span>
-                              ) : (
-                                <div className="space-y-1">
-                                  <button
-                                    className="px-3 py-1 text-white bg-green-600 hover:bg-green-700 rounded-md w-full"
-                                    onClick={() => markTripAsCompleted(trip.id)}
-                                  >
-                                    Mark as Completed
-                                  </button>
-                                  <button
-                                    className="px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded-md w-full"
-                                    onClick={() => requestCancelTrip(trip.id)}
+                                    className="px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded-md w-fit"
+                                    onClick={() =>
+                                      setCancelModalTripId(trip.id)
+                                    }
                                   >
                                     Request Cancel
                                   </button>
@@ -331,24 +274,73 @@ export const CarrierDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Cancellation Modal */}
+      {cancelModalTripId && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full animate-fade-in">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Confirm Cancellation
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to request cancellation? It will only be
+              completed when both sides agree.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setCancelModalTripId(null)}
+                className="px-4 py-1.5 text-sm rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+              >
+                No
+              </button>
+              <button
+                onClick={() => requestCancelTrip(cancelModalTripId)}
+                className="px-4 py-1.5 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+              >
+                Yes, Request Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Completion Modal */}
+      {completeModalTripId && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full animate-fade-in">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Confirm Completion
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to mark this trip as completed?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setCompleteModalTripId(null)}
+                className="px-4 py-1.5 text-sm rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+              >
+                No
+              </button>
+              <button
+                onClick={() => markTripAsCompleted(completeModalTripId)}
+                className="px-4 py-1.5 text-sm rounded bg-green-500 text-white hover:bg-green-600"
+              >
+                Yes, Mark Completed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 const DashboardCard = ({ icon, title, value }) => (
-  <div className="bg-white overflow-hidden shadow rounded-lg">
-    <div className="p-5">
-      <div className="flex items-center">
-        <div className="flex-shrink-0">{icon}</div>
-        <div className="ml-5 w-0 flex-1">
-          <dl>
-            <dt className="text-sm font-medium text-gray-500 truncate">
-              {title}
-            </dt>
-            <dd className="text-lg font-medium text-gray-900">{value}</dd>
-          </dl>
-        </div>
-      </div>
+  <div className="bg-white p-6 rounded-lg shadow-md flex items-center">
+    <div className="bg-indigo-500 text-white p-3 rounded-full mr-4">{icon}</div>
+    <div>
+      <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
     </div>
   </div>
 );

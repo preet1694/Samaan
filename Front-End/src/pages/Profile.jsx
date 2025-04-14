@@ -9,6 +9,7 @@ export const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [phoneError, setPhoneError] = useState(null);
   const storedEmail = localStorage.getItem("email");
 
   useEffect(() => {
@@ -34,9 +35,19 @@ export const Profile = () => {
     };
 
     fetchProfile();
-  }, []);
+  }, [storedEmail]);
+
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
+  };
 
   const updateProfile = async () => {
+    if (!validatePhoneNumber(profile.phone)) {
+      setPhoneError("Phone number must be exactly 10 digits");
+      return;
+    }
+
     try {
       await axios.post(
         "https://samaan-pooling.onrender.com/api/users/update",
@@ -44,6 +55,7 @@ export const Profile = () => {
       );
       alert("Profile updated successfully!");
       setIsEditing(false);
+      setPhoneError(null); // Reset phone error after successful update
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile");
@@ -54,7 +66,6 @@ export const Profile = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          
           <div className="relative h-40 bg-indigo-600">
             <div className="absolute -bottom-14 left-8">
               <div className="relative">
@@ -67,13 +78,10 @@ export const Profile = () => {
                     alt="Profile"
                   />
                 )}
-                <button className="absolute bottom-0 right-0 p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 z-20">
-                  <Camera className="h-5 w-5 text-gray-400" />
-                </button>
+                <button className="absolute bottom-0 right-0 p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 z-20"></button>
               </div>
             </div>
           </div>
-          
           <div className="pt-24 px-8 pb-8">
             <div className="flex justify-between items-center mb-6">
               <div>
@@ -128,7 +136,6 @@ export const Profile = () => {
               )}
             </div>
 
-            
             <div className="space-y-6">
               {["Full Name", "Email", "Phone", "Address"].map(
                 (field, index) => (
@@ -178,12 +185,14 @@ export const Profile = () => {
                         />
                       )}
                     </div>
+                    {phoneError && index === 2 && (
+                      <p className="text-red-500 text-xs">{phoneError}</p>
+                    )}
                   </div>
                 )
               )}
             </div>
           </div>{" "}
-          
         </div>
       </div>
     </div>

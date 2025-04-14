@@ -36,6 +36,7 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [notification, setNotification] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [loading, setLoading] = useState(true);
   const stompClientRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -67,6 +68,7 @@ const Chat = () => {
     const stompClient = Stomp.over(
       new SockJS("https://samaan-pooling.onrender.com/ws")
     );
+    stompClient.debug = null; // 🛑 Disable console logs from SockJS/Stomp
 
     stompClient.connect({}, () => {
       stompClient.subscribe(`/topic/chat/${roomId}`, (msg) => {
@@ -87,7 +89,8 @@ const Chat = () => {
       )
         .then((res) => res.json())
         .then((data) => {
-          setMessages(data);
+          setMessages(data || []);
+          setLoading(false);
           axios.post(
             "https://samaan-pooling.onrender.com/api/chat/mark-read",
             {},
@@ -99,8 +102,9 @@ const Chat = () => {
             }
           );
         })
-
-        .catch(console.error);
+        .catch((error) => {
+          setLoading(false);
+        });
     });
 
     stompClientRef.current = stompClient;
@@ -115,6 +119,7 @@ const Chat = () => {
 
     const socket = new SockJS("https://samaan-pooling.onrender.com/ws");
     const stompClient = Stomp.over(socket);
+    stompClient.debug = null;
 
     stompClient.connect({}, () => {
       stompClient.subscribe(`/topic/notifications/${receiverEmail}`, (msg) => {
@@ -172,7 +177,7 @@ const Chat = () => {
         )}
 
         <div className="flex-1 overflow-y-auto bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 flex flex-col gap-3 mb-4 shadow-inner">
-          {messages.length === 0 ? (
+          {loading ? (
             <div className="flex flex-col gap-2">
               {[1, 2, 3].map((i) => (
                 <div
@@ -188,23 +193,38 @@ const Chat = () => {
                 />
               ))}
             </div>
+          ) : messages.length === 0 ? (
+            <div className="text-center text-gray-500 text-sm italic">
+              No messages yet. Start the conversation!
+            </div>
           ) : (
-            messages.map((msg, i) => (
-              <div
-                key={i}
-                className={`px-4 py-2 rounded-2xl shadow-md text-sm animate-fadeIn break-words ${
-                  msg.senderEmail === loggedInUserEmail
-                    ? "self-end bg-indigo-100 text-indigo-900"
-                    : "self-start bg-gray-200 text-gray-800"
-                }`}
-                style={{ maxWidth: "75%" }}
-              >
-                <p className="font-semibold mb-1 text-xs">
-                  {msg.senderEmail === loggedInUserEmail ? "You" : receiverName}
-                </p>
-                <p className="whitespace-pre-wrap">{msg.message}</p>
-              </div>
-            ))
+            messages.map((msg, i) => {
+              const isSender = msg.senderEmail === loggedInUserEmail;
+              const timestamp = new Date(msg.timestamp).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+
+              return (
+                <div
+                  key={i}
+                  className={`px-4 py-2 rounded-2xl shadow-md text-sm animate-fadeIn break-words ${
+                    isSender
+                      ? "self-end bg-indigo-100 text-indigo-900"
+                      : "self-start bg-gray-200 text-gray-800"
+                  }`}
+                  style={{ maxWidth: "75%" }}
+                >
+                  <p className="font-semibold mb-1 text-xs">
+                    {isSender ? "You" : receiverName}
+                  </p>
+                  <p className="whitespace-pre-wrap">{msg.message}</p>
+                  <div className="flex justify-between mt-1 text-xs text-gray-500 italic">
+                    <span>{timestamp}</span>
+                  </div>
+                </div>
+              );
+            })
           )}
           <div ref={messagesEndRef} />
         </div>
