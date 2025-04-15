@@ -7,17 +7,18 @@ const ChatsPage = () => {
   const [names, setNames] = useState({});
   const [loading, setLoading] = useState(true);
   const [unreadMap, setUnreadMap] = useState({});
-  const carrierEmail = localStorage.getItem("email");
+  const userEmail = localStorage.getItem("email");
+  const userRole = localStorage.getItem("userRole");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!carrierEmail) return;
+    if (!userEmail || !userRole) return;
 
     const fetchChats = async () => {
       try {
         const response = await axios.get(
           "https://samaan-pooling.onrender.com/api/chat/all",
-          { params: { carrierEmail } }
+          { params: { carrierEmail: userEmail } } // assuming only carriers can see this page
         );
 
         const chatData = response.data || {};
@@ -42,9 +43,9 @@ const ChatsPage = () => {
     };
 
     fetchChats();
-    const interval = setInterval(fetchChats, 10000); // Refresh every 10 seconds
+    const interval = setInterval(fetchChats, 10000);
     return () => clearInterval(interval);
-  }, [carrierEmail]);
+  }, [userEmail, userRole]);
 
   const fetchNames = async (emails) => {
     const updatedNames = { ...names };
@@ -95,17 +96,21 @@ const ChatsPage = () => {
           renderSkeleton()
         ) : sortedSenders.length > 0 ? (
           <ul className="space-y-4">
-            {sortedSenders.map((senderEmail) => {
-              const messages = chats[senderEmail] || [];
+            {sortedSenders.map((otherEmail) => {
+              const messages = chats[otherEmail] || [];
               const lastMessage = messages[messages.length - 1];
-              const isUnread = unreadMap[senderEmail];
+              const isUnread = unreadMap[otherEmail];
+
+              const senderEmail =
+                userRole === "sender" ? userEmail : otherEmail;
+              const carrierEmail =
+                userRole === "carrier" ? userEmail : otherEmail;
+              const roomId = `${senderEmail}_${carrierEmail}`;
 
               return (
                 <li
-                  key={senderEmail}
-                  onClick={() =>
-                    navigate(`/join-chat?roomId=${senderEmail}_${carrierEmail}`)
-                  }
+                  key={otherEmail}
+                  onClick={() => navigate(`/join-chat?roomId=${roomId}`)}
                   className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-5 rounded-xl shadow-sm transition-all duration-200 cursor-pointer ${
                     isUnread
                       ? "bg-indigo-100 border-l-4 border-indigo-500 animate-pulse-fast"
@@ -114,7 +119,7 @@ const ChatsPage = () => {
                 >
                   <div className="flex-1">
                     <div className="text-lg sm:text-xl font-semibold text-indigo-700 truncate">
-                      {names[senderEmail] || senderEmail}
+                      {names[otherEmail] || otherEmail}
                     </div>
                     <div className="text-sm text-gray-600 mt-1 truncate max-w-full">
                       {lastMessage ? (
@@ -131,7 +136,7 @@ const ChatsPage = () => {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1 min-w-[150px] text-right">
-                    <span className="text-xs text-gray-400">{senderEmail}</span>
+                    <span className="text-xs text-gray-400">{otherEmail}</span>
                     <span className="text-xs text-gray-400 hidden sm:block">
                       Tap to open chat →
                     </span>
