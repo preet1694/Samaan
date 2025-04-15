@@ -39,10 +39,7 @@ export const Register = () => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        navigate(
-          formData.role === "sender"
-            ? "/sender/dashboard"
-            : "/carrier/dashboard"
+        navigate("/login"
         );
       }
     } catch (error) {
