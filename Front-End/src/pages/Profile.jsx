@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { User, Mail, Phone, MapPin, Shield, Camera } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Shield,
+} from "lucide-react";
 import profileimg from "../assets/profile.jpg";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -12,28 +18,27 @@ export const Profile = () => {
   const [phoneError, setPhoneError] = useState(null);
   const storedEmail = localStorage.getItem("email");
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        if (!storedEmail) {
-          console.error("No email found in localStorage");
-          return;
-        }
-
-        const response = await axios.post(
-          "https://samaan-pooling.onrender.com/api/users/getByEmail",
-          { email: storedEmail }
-        );
-
-        console.log("User Data:", response.data);
-        setProfile(response.data);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      } finally {
-        setLoading(false);
+  const fetchProfile = async () => {
+    try {
+      if (!storedEmail) {
+        console.error("No email found in localStorage");
+        return;
       }
-    };
 
+      const response = await axios.post(
+        "https://samaan-pooling.onrender.com/api/users/getByEmail",
+        { email: storedEmail }
+      );
+
+      setProfile(response.data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProfile();
   }, [storedEmail]);
 
@@ -43,7 +48,7 @@ export const Profile = () => {
   };
 
   const updateProfile = async () => {
-    if (!validatePhoneNumber(profile.phone)) {
+    if (!validatePhoneNumber(profile.phoneNumber)) {
       setPhoneError("Phone number must be exactly 10 digits");
       return;
     }
@@ -51,11 +56,18 @@ export const Profile = () => {
     try {
       await axios.post(
         "https://samaan-pooling.onrender.com/api/users/update",
-        profile
+        {
+          email: profile.email,
+          name: profile.name,
+          phoneNumber: profile.phoneNumber,
+          address: profile.address,
+        }
       );
       alert("Profile updated successfully!");
       setIsEditing(false);
-      setPhoneError(null); // Reset phone error after successful update
+      setPhoneError(null);
+      setLoading(true); // Show loading while refetching
+      await fetchProfile(); // Refetch to get updated values
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile");
@@ -78,7 +90,6 @@ export const Profile = () => {
                     alt="Profile"
                   />
                 )}
-                <button className="absolute bottom-0 right-0 p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 z-20"></button>
               </div>
             </div>
           </div>
@@ -167,7 +178,7 @@ export const Profile = () => {
                               : index === 1
                               ? profile.email || ""
                               : index === 2
-                              ? profile.phone || ""
+                              ? profile.phoneNumber || ""
                               : profile.address || ""
                           }
                           disabled={index === 1 || !isEditing}
@@ -175,7 +186,10 @@ export const Profile = () => {
                             if (index === 0)
                               setProfile({ ...profile, name: e.target.value });
                             if (index === 2)
-                              setProfile({ ...profile, phone: e.target.value });
+                              setProfile({
+                                ...profile,
+                                phoneNumber: e.target.value,
+                              });
                             if (index === 3)
                               setProfile({
                                 ...profile,
@@ -192,7 +206,7 @@ export const Profile = () => {
                 )
               )}
             </div>
-          </div>{" "}
+          </div>
         </div>
       </div>
     </div>
