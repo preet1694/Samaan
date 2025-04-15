@@ -1,83 +1,120 @@
-# Samaan: Peer-to-Peer Package Delivery Platform
+# 📦 Samaan: Peer-to-Peer Package Delivery Platform
 
-## Overview
-Samaan is a platform that connects people who need to send packages with travelers willing to carry them. By utilizing the unused baggage space of travelers, Samaan enables cost-effective, reliable, and eco-friendly delivery of packages.
+![React](https://img.shields.io/badge/frontend-React.js-61dafb?logo=react)
+![Spring Boot](https://img.shields.io/badge/backend-Spring%20Boot-6DB33F?logo=springboot)
+![MongoDB](https://img.shields.io/badge/database-MongoDB-4EA94B?logo=mongodb)
 
-## Features
-- **Package Requests:** Users can post details of their package, including size, weight, destination, and deadline.
-- **Traveler Listings:** Travelers can list their trips, specifying their destination, baggage space available, and travel date.
-- **Secure Communication:** In-app messaging allows senders and travelers to discuss package details securely.
-- **Payment System:** Secure payment integration ensures fair compensation for the traveler.
-- **User Ratings:** Both senders and travelers can rate each other to maintain trust within the community.
-- **Real-Time Tracking:** Track the progress of your package with updates from the traveler.
+Live Project: 👉 [Visit Now](https://samaan.onrender.com)  
+Backend Repository: 👉 [GitHub - Backend Repo](https://github.com/preet1694/Samaan-Backend)
 
-## Tech Stack
-- **Frontend:** React.js
-- **Backend:** Spring Boot
+---
 
-## Installation
+## 🚀 Overview
 
-### Prerequisites
-- Node.js (version 14 or above)
+**Samaan** is a peer-to-peer logistics platform that connects senders with carriers having spare vehicle space. It offers an innovative solution to traditional courier limitations through a community-driven delivery model. The system supports trip creation, package selection, and real-time communication via WebSocket.
+
+---
+
+## 🔑 Key Features
+
+- 🧑‍💼 Role-based Authentication (Sender & Carrier)
+- 🚗 Add/View Trips with Source, Destination & Capacity
+- 💬 Real-Time Chat (WebSocket powered)
+- 📊 Dynamic Dashboards for Both Roles
+- 🔒 Secure Login & MongoDB Integration
+- 🔍 Trip Matching and Package Request System
+- 📦 Sender Feedback on Completed Trips
+
+---
+
+## 🧱 Tech Stack
+
+| Category      | Technology                     |
+|---------------|--------------------------------|
+| Frontend      | React.js, Tailwind CSS         |
+| Backend       | Spring Boot (Java)             |
+| Database      | MongoDB Atlas                  |
+| Real-Time     | WebSocket (STOMP protocol)     |
+| Hosting       | Render (Backend), Render (Frontend) |
+| Distance Calculation   | OpenCage Api   |
+
+---
+
+## 📚 Installation & Setup
+
+### 🔧 Prerequisites
+- Node.js v14+
+- Java 17+
+- MongoDB Atlas account
 - Git
 
-### Steps
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/preet1694/SamaanPooling.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd SamaanPooling
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Configure environment variables:
-   - Create a `.env` file in the root directory.
-   - Add the following variables:
-     ```env
-     DATABASE_URL=your_database_url
-     PORT=your_port_number
-     JWT_SECRET=your_jwt_secret
-     ```
-5. Start the application:
-   ```bash
-   npm start
-   ```
-6. Access the application in your browser at `http://localhost:<PORT>`.
+### 📦 Frontend Setup
 
-## Usage
-1. **Sign Up:** Create an account as a sender or traveler.
-2. **Post a Request/Listing:**
-   - Senders: Provide package details and destination.
-   - Travelers: Specify travel plans and available baggage space.
-3. **Match & Connect:** Search for compatible senders or travelers and initiate communication.
-4. **Confirm & Pay:** Finalize the agreement and process the payment through the app.
-5. **Track & Deliver:** Monitor the package's journey until it reaches the destination.
+```bash
+git clone https://github.com/preet1694/Samaan.git
+cd SamaanPooling
+npm install
+npm start
+```
 
-## Contributing
-Contributions are welcome! Follow these steps to contribute:
-1. Fork the repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Make your changes and commit them:
-   ```bash
-   git commit -m "Description of changes"
-   ```
-4. Push your changes:
-   ```bash
-   git push origin feature-name
-   ```
-5. Open a pull request.
+### 🔧 Backend Setup
 
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+```bash
+git clone https://github.com/preet1694/Samaan-Backend.git
+cd SamaanPooling-Backend
+# Configure MongoDB URI and JWT_SECRET in application.properties
+# Configure the application.properties file and add appropriate values
+mvn spring-boot:run
+```
 
-## Contact
-For queries or support, reach out to us:
-- **GitHub:** [github.com/preet1694/SamaanPooling](https://github.com/preet1694/SamaanPooling/)
+---
 
+## 🛠️ Core Modules
+
+| Module              | Description                                      |
+|---------------------|--------------------------------------------------|
+| Authentication      | Login, registration, role management             |
+| Trip Management     | Carrier adds/view trips                          |
+| Trip Search         | Sender filters trips by city and date            |
+| Chat System         | Real-time 1:1 messaging via WebSocket            |
+| Dashboards          | Sender & Carrier views for trip management       |
+
+---
+
+## 📋 Usage Instructions
+
+### 👤 Sender
+- Register and login as a sender
+- Search for carrier trips by location and date
+- Chat with carrier and confirm delivery
+- Provide feedback on completed trips
+
+### 🚗 Carrier
+- Register and login as a carrier
+- Add new trips and view trip statistics
+- Receive chat requests from senders
+- Mark trips as completed
+
+---
+
+
+## 👨‍🎓 Authors
+
+- **Preet Ketankumar Brahmbhatt** (IT116)  
+- **Ranipa Vraj Munesh** (IT120)  
+> *Department of Information Technology, Dharmsinh Desai University*
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+## 📬 Contact
+
+If you have any questions or suggestions:
+
+- 📧 Email: `preet.brahmbhatt16@gmail.com`, `vrajranipa7@gmail.com`
+- 🔗 LinkedIn : [Preet Brahmbhatt](https://linkedin.com/in/preet-brahmbhatt) [Vraj Ranipa](https://www.linkedin.com/in/vraj-ranipa-3ba173265/)
