@@ -11,13 +11,12 @@ export const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "sender", // Default role
+    role: "sender",
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Client-side validation
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
       return;
@@ -58,28 +57,28 @@ export const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="flex items-center">
-            <Package className="h-12 w-12 text-indigo-600" />
+            <Package className="h-10 w-10 text-indigo-600" />
             <span className="ml-2 text-3xl font-bold text-gray-900">
               Samaan
             </span>
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mt-4 text-center text-3xl font-semibold text-gray-900">
           Create your account
         </h2>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <div className="bg-white py-8 px-6 shadow-md sm:rounded-lg sm:px-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Full Name
               </label>
@@ -92,8 +91,8 @@ export const Register = () => {
                   name="name"
                   type="text"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
-                  placeholder="John Doe"
+                  className="text-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 border-gray-300 rounded-md py-1.5"
+                  placeholder="Virat Kohli"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -105,7 +104,7 @@ export const Register = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Email address
               </label>
@@ -118,7 +117,7 @@ export const Register = () => {
                   name="email"
                   type="email"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                  className="text-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 border-gray-300 rounded-md py-1.5"
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) =>
@@ -131,7 +130,7 @@ export const Register = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Password
               </label>
@@ -144,7 +143,7 @@ export const Register = () => {
                   name="password"
                   type="password"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                  className="text-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 border-gray-300 rounded-md py-1.5"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
@@ -156,7 +155,7 @@ export const Register = () => {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-base font-medium text-gray-700"
               >
                 Confirm Password
               </label>
@@ -169,7 +168,7 @@ export const Register = () => {
                   name="confirmPassword"
                   type="password"
                   required
-                  className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                  className="text-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 border-gray-300 rounded-md py-1.5"
                   value={formData.confirmPassword}
                   onChange={(e) =>
                     setFormData({
@@ -182,11 +181,11 @@ export const Register = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-base font-medium text-gray-700">
                 I want to be a
               </label>
-              <div className="mt-2 space-x-4">
-                <label className="inline-flex items-center">
+              <div className="mt-1 space-x-6">
+                <label className="inline-flex items-center text-sm">
                   <input
                     type="radio"
                     name="role"
@@ -199,7 +198,7 @@ export const Register = () => {
                   />
                   <span className="ml-2">Sender</span>
                 </label>
-                <label className="inline-flex items-center">
+                <label className="inline-flex items-center text-sm">
                   <input
                     type="radio"
                     name="role"
@@ -218,7 +217,7 @@ export const Register = () => {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full text-base flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Register
               </button>
@@ -237,7 +236,7 @@ export const Register = () => {
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-4">
               <GoogleAuth />
             </div>
           </div>

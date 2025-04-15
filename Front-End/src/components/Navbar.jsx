@@ -60,7 +60,7 @@ export const Navbar = () => {
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center gap-2 text-gray-800 font-medium hover:text-indigo-600 transition"
+                  className="flex items-center gap-2 text-gray-800 font-medium hover:text-indigo-600 transition text-base"
                 >
                   <span>{userName}</span>
                   <User className="h-6 w-6 text-gray-500" />
@@ -78,7 +78,7 @@ export const Navbar = () => {
                       {userRole === "carrier" && (
                         <Link
                           to="/carrier/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
+                          className="block px-4 py-2 text-base text-gray-700 hover:bg-indigo-50"
                         >
                           Dashboard
                         </Link>
@@ -87,13 +87,13 @@ export const Navbar = () => {
                         <>
                           <Link
                             to="/sender/dashboard"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
+                            className="block px-4 py-2 text-base text-gray-700 hover:bg-indigo-50"
                           >
                             Dashboard
                           </Link>
                           <Link
                             to="/search-carrier"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
+                            className="block px-4 py-2 text-base text-gray-700 hover:bg-indigo-50"
                           >
                             Search Carrier
                           </Link>
@@ -101,13 +101,13 @@ export const Navbar = () => {
                       )}
                       <Link
                         to="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50"
+                        className="block px-4 py-2 text-base text-gray-700 hover:bg-indigo-50"
                       >
                         Profile
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50"
+                        className="block w-full text-left px-4 py-2 text-base text-gray-700 hover:bg-red-50"
                       >
                         Sign out
                       </button>
@@ -119,13 +119,13 @@ export const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
+                  className="text-base font-medium text-gray-700 hover:text-indigo-600 transition"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 text-sm font-medium transition"
+                  className="px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 text-base font-medium transition"
                 >
                   Register
                 </Link>
