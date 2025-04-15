@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Shield,
-} from "lucide-react";
+import { User, Mail, Phone, MapPin, Shield } from "lucide-react";
 import profileimg from "../assets/profile.jpg";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -56,18 +50,12 @@ export const Profile = () => {
     try {
       await axios.post(
         "https://samaan-pooling.onrender.com/api/users/update",
-        {
-          email: profile.email,
-          name: profile.name,
-          phoneNumber: profile.phoneNumber,
-          address: profile.address,
-        }
+        profile
       );
       alert("Profile updated successfully!");
       setIsEditing(false);
       setPhoneError(null);
-      setLoading(true); // Show loading while refetching
-      await fetchProfile(); // Refetch to get updated values
+      fetchProfile(); // Re-fetch updated data
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile");
@@ -113,7 +101,6 @@ export const Profile = () => {
               </button>
             </div>
 
-            {/* Verification Badges */}
             <div className="flex space-x-4 mb-8">
               {loading ? (
                 <Skeleton width={100} height={25} />
@@ -183,18 +170,22 @@ export const Profile = () => {
                           }
                           disabled={index === 1 || !isEditing}
                           onChange={(e) => {
+                            const value = e.target.value;
                             if (index === 0)
-                              setProfile({ ...profile, name: e.target.value });
+                              setProfile((prev) => ({
+                                ...prev,
+                                name: value,
+                              }));
                             if (index === 2)
-                              setProfile({
-                                ...profile,
-                                phoneNumber: e.target.value,
-                              });
+                              setProfile((prev) => ({
+                                ...prev,
+                                phoneNumber: value,
+                              }));
                             if (index === 3)
-                              setProfile({
-                                ...profile,
-                                address: e.target.value,
-                              });
+                              setProfile((prev) => ({
+                                ...prev,
+                                address: value,
+                              }));
                           }}
                         />
                       )}
